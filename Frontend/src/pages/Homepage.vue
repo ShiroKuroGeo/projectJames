@@ -88,7 +88,7 @@ const roles = ref([
 
 const fetchVenues = async () => {
     const response = await useVenue.getList();
-    featuredFacility.value = response.find(ar => ar.venue.is_featured === 1);
+    featuredFacility.value = response.find(ar => ar.venue.is_featured === true);
     const lowestStartingPrice = response.flatMap(venueAdmin =>
         venueAdmin.venue?.courts?.map(court => Number(court.price)) ?? []
     )
