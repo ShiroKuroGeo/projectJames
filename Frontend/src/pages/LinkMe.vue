@@ -4,21 +4,12 @@
             <div class="nav-inner">
                 <router-link to="/" class="brand">
                     <div class="brand-mark">
-                        <svg width="28" height="28" viewBox="0 0 30 30">
-                            <rect width="30" height="30" rx="8" fill="#C3DD41" />
-                            <circle cx="15" cy="15" r="6.5" fill="none" stroke="#001B3E" stroke-width="2" />
-                            <line x1="15" y1="4" x2="15" y2="26" stroke="#001B3E" stroke-width="1.2" stroke-dasharray="1.6 2.4" />
-                        </svg>
+                        <img :src="Logo" alt="" style="width: 28px; height: 28px;">
                     </div>
                     <span class="brand-word">
-                        Court<span>tesy</span>
+                        <span>Court-<span style="color: white;">tesy</span></span>
                     </span>
                 </router-link>
-                <div class="nav-links">
-                    <router-link to="/">Home</router-link>
-                    <a href="#courts">Courts</a>
-                    <a href="#location">Location</a>
-                </div>
                 <div class="nav-right">
                     <button v-if="courtSelected?.id" class="nav-book-btn" @click="openReservation">
                         Book a Court
@@ -31,9 +22,7 @@
             <div class="hero-grid"></div>
             <div class="wrap hero-content">
                 <div class="breadcrumb mono">
-                    <router-link to="/venues">
-                        VENUES
-                    </router-link>
+                    VENUES
                     <span>/</span>
                     <span>
                         {{ venue?.name || 'LOADING...' }}
@@ -41,7 +30,7 @@
                 </div>
                 <div v-if="venue" class="venue-header-grid">
                     <div class="venue-logo-wrap">
-                        <img :src="Logo" :alt="`${venue?.name || 'Venue'} logo`" class="venue-logo" loading="eager" />
+                        <img :src="image(venue?.admins[0]?.image)" :alt="`${venue?.name || 'Venue'} logo`" class="venue-logo" loading="eager" />
                         <div class="logo-status">
                             <span></span>
                             OPEN FOR BOOKINGS
@@ -142,7 +131,7 @@
                                 {{ court.name }}
                             </div>
                             <div class="ctype mono">
-                                {{ court.tag || 'STANDARD COURT' }}
+                                {{ viewTags(court.tag) || 'STANDARD COURT' }}
                                 <span>·</span>
                                 {{ court.price_definition || 'HOURLY' }}
                             </div>
@@ -223,7 +212,7 @@
                             <div class="detail-row">
                                 <span>Environment</span>
                                 <strong>
-                                    {{ courtSelected?.tag || '—' }}
+                                    {{ viewTags(courtSelected?.tag) || '—' }}
                                 </strong>
                             </div>
                             <div class="detail-row">
@@ -507,7 +496,7 @@
 
                                         </div>
 
-                                        <button type="button" class="stepper-btn" @click="incPlayers" :disabled="players >= 4">
+                                        <button type="button" class="stepper-btn" @click="incPlayers">
                                             +
                                         </button>
 
@@ -525,96 +514,54 @@
                                             optional
                                         </span>
                                     </label>
-
                                     <textarea v-model="notes" class="form-input form-textarea" rows="3" placeholder="Anything the court staff should know?"></textarea>
-
                                 </div>
-
                             </div>
-
                         </section>
-
                         <div v-if="!canConfirmBooking" class="booking-hint">
-
                             <span>!</span>
-
                             <div>
                                 <strong>
                                     Complete your booking details
                                 </strong>
-
                                 <p>
                                     Select a date, time, and provide your
                                     contact information before confirming.
                                 </p>
                             </div>
-
                         </div>
-
-
                     </div>
-
                     <div class="offcanvas-footer">
-
                         <div class="booking-summary">
-
                             <div class="summary-main">
-
                                 <span class="summary-label mono">
                                     TOTAL
                                 </span>
-
                                 <strong>
                                     {{ totalHours }}
                                     {{ totalHours === 1 ? 'hour' : 'hours' }}
                                 </strong>
-
                                 <small>
                                     {{ timeLabel || 'No time selected' }}
                                 </small>
-
                             </div>
-
                             <div class="summary-price">
-
-                                <span>
-                                    ESTIMATED
-                                </span>
-
-                                <strong>
-                                    ₱{{ bookingTotal }}
-                                </strong>
-
+                                <span>ESTIMATED</span>
+                                <strong> ₱{{ bookingTotal }} </strong>
                             </div>
-
                         </div>
-
-
-                        <button type="button" class="btn btn-lime confirm-btn" :disabled="!canConfirmBooking || confirmed" @click="confirmBooking">
-                            {{
-                                confirmed
-                                    ? 'Court Held ✓'
-                                    : 'Confirm & Pay'
-                            }}
-
-                            <span v-if="!confirmed">
-                                →
-                            </span>
+                        <button type="button" class="btn btn-lime confirm-btn" :disabled="!canConfirmBooking" @click="confirmBooking">
+                            {{ confirmed ? 'Court Held ✓' : 'Confirm & Pay' }}
+                            <span v-if="!confirmed"> → </span>
                         </button>
-
                         <p class="secure-note">
                             Your reservation details will be sent
                             after confirmation.
                         </p>
-
                     </div>
-
                 </aside>
-
             </Transition>
-
         </Teleport>
-
         <footer>
 
             <div class="wrap footer-inner">
@@ -702,9 +649,14 @@ import { useCourtStore } from '@/stores/UseCourt'
 import { useVenueStore } from '@/stores/UseVenues'
 import { useRoute } from 'vue-router'
 import Logo from '@/component/assets/logo.jpg'
+import { image } from '@/utils/image'
+import { useBookingStore } from '@/stores/UseBooking'
+import { usePaymentStore } from '@/stores/UsePayment'
 
 const useCourt = useCourtStore()
 const useVenue = useVenueStore()
+const useBooking = useBookingStore();
+const usePayment = usePaymentStore();
 const route = useRoute()
 
 const venue = ref(null)
@@ -747,6 +699,10 @@ maxDate.setDate(
 const viewYear = ref(
     today.getFullYear()
 )
+
+const viewTags = (tag) => {
+    return tag?.join(', ') ?? ''
+}
 
 const viewMonth = ref(
     today.getMonth()
@@ -883,11 +839,6 @@ function shiftMonth(direction) {
     viewYear.value = year
 }
 
-
-/* ============================================================
-   DATE
-============================================================ */
-
 function isDateBlocked(cell) {
 
     if (!cell) {
@@ -974,11 +925,6 @@ function selectDate(cell) {
             })
     })
 }
-
-
-/* ============================================================
-   TIME
-============================================================ */
 
 function normalize(time) {
 
@@ -1144,7 +1090,6 @@ function selectSlot(slot) {
     )
 
     if (rangeHasBlocker) {
-        // Can't span the range -> restart selection with just this slot
         selectedSlots.value = [slot]
     } else {
         selectedSlots.value = slotsInRange
@@ -1156,44 +1101,6 @@ function selectSlot(slot) {
 
     updateTimeLabel()
 }
-// function selectSlot(slot) {
-
-//     if (
-//         slot.taken ||
-//         slot.reserved ||
-//         slot.blocked
-//     ) {
-//         return
-//     }
-
-//     const index =
-//         selectedSlots.value.findIndex(
-//             selected =>
-//                 selected.time === slot.time
-//         )
-
-//     if (index !== -1) {
-
-//         selectedSlots.value.splice(
-//             index,
-//             1
-//         )
-
-//     } else {
-
-//         selectedSlots.value.push(slot)
-
-//     }
-
-//     selectedSlots.value.sort(
-//         (a, b) =>
-//             convertToMinutes(a.time) -
-//             convertToMinutes(b.time)
-//     )
-
-//     updateTimeLabel()
-// }
-
 
 function clearSelectedTime() {
 
@@ -1243,8 +1150,6 @@ function updateTimeLabel() {
 
     const slotDurationMinutes = 60
 
-    // single slot still represents a full hour block
-    // multiple slots use the last click as the boundary, not +1hr past it
     const endMinutes =
         isSingleSlot
             ? lastSlotMinutes + slotDurationMinutes
@@ -1255,7 +1160,7 @@ function updateTimeLabel() {
             startMinutes) / 60
 
     totalHours.value =
-        durationHours
+        durationHours + 1
 
     const startTime =
         sorted[0].time
@@ -1283,16 +1188,8 @@ const bookingTotal = computed(() => {
     )
 })
 
-
-/* ============================================================
-   PLAYERS
-============================================================ */
-
 function incPlayers() {
-
-    if (players.value < 4) {
-        players.value++
-    }
+    players.value++
 }
 
 
@@ -1302,11 +1199,6 @@ function decPlayers() {
         players.value--
     }
 }
-
-
-/* ============================================================
-   VALIDATION
-============================================================ */
 
 const detailsValid = computed(() => {
 
@@ -1327,11 +1219,6 @@ const canConfirmBooking = computed(() => {
         detailsValid.value
     )
 })
-
-
-/* ============================================================
-   COURTS
-============================================================ */
 
 async function loadCourts(currentVenue) {
 
@@ -1440,11 +1327,6 @@ async function loadCourts(currentVenue) {
     }
 }
 
-
-/* ============================================================
-   SELECT COURT
-============================================================ */
-
 function selectedCourt(court) {
 
     if (!court) {
@@ -1457,9 +1339,6 @@ function selectedCourt(court) {
     courtSelected.value =
         court
 
-    /*
-     * Reset current booking when switching courts.
-     */
     date.value = null
 
     selectedSlots.value = []
@@ -1486,11 +1365,6 @@ function selectedCourt(court) {
     })
 }
 
-
-/* ============================================================
-   CONTACT RESET
-============================================================ */
-
 function clearContactDetails() {
 
     firstName.value = ''
@@ -1505,11 +1379,6 @@ function clearContactDetails() {
 
     notes.value = ''
 }
-
-
-/* ============================================================
-   RESERVATION DRAWER
-============================================================ */
 
 function openReservation() {
 
@@ -1526,11 +1395,6 @@ function openReservation() {
     )
 
     nextTick(() => {
-
-        /*
-         * Fix Leaflet rendering when the
-         * page underneath the drawer/map changes.
-         */
         if (map.value) {
             setTimeout(() => {
                 map.value.invalidateSize()
@@ -1539,7 +1403,6 @@ function openReservation() {
 
     })
 }
-
 
 function closeReservation() {
 
@@ -1550,39 +1413,95 @@ function closeReservation() {
     )
 }
 
+const getBookingTime = (slots) => {
+    if (!slots?.length) {
+        return {
+            start_time: null,
+            end_time: null,
+            hours: 0,
+        }
+    }
 
-/* ============================================================
-   CONFIRM BOOKING
-============================================================ */
+    const times = slots.map(slot => slot.time)
 
-function confirmBooking() {
+    const start_time = times[0]
+    const end_time = times[times.length - 1]
+    const hours = slots.length
+
+    return {
+        start_time,
+        end_time,
+        hours,
+    }
+}
+
+const generateBookingCode = () => {
+    const now = new Date()
+
+    const timestamp =
+        now.getFullYear().toString() +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        String(now.getDate()).padStart(2, '0') +
+        String(now.getHours()).padStart(2, '0') +
+        String(now.getMinutes()).padStart(2, '0') +
+        String(now.getSeconds()).padStart(2, '0')
+
+    let hash = 0
+
+    for (let i = 0; i < timestamp.length; i++) {
+        hash = ((hash << 5) - hash) + timestamp.charCodeAt(i)
+        hash |= 0
+    }
+
+    const number = Math.abs(hash) % 1000000
+
+    return `CT-${String(number).padStart(6, '0')}`
+}
+
+const confirmBooking = async () => {
 
     if (!canConfirmBooking.value) {
         return
     }
 
-    /*
-     * Keep your existing booking API here.
-     *
-     * Example:
-     *
-     * await useBooking.createBooking({
-     *     venue_id: venue.value.id,
-     *     court_id: courtSelected.value.id,
-     *     date: date.value,
-     *     slots: selectedSlots.value,
-     *     first_name: firstName.value,
-     *     last_name: lastName.value,
-     *     phone: phone.value,
-     *     email: email.value,
-     *     players: players.value,
-     *     notes: notes.value
-     * })
-     */
+    let clicked = false;
+    
+    if (clicked) { alert('Too many attempts to click'); return };
+    clicked = true;
 
-    confirmed.value = true
+    const bookingTime = getBookingTime(selectedSlots.value);
+    const downpayment = (bookingTime.hours * courtSelected.value.price) * .5;
+    const bookingCode = generateBookingCode();
+    const amount = bookingTime.hours <= 2 ? downpayment : 350;
+
+    const formData = {
+        booking_code: bookingCode,
+        venue_id: venue.value.id,
+        court_id: courtSelected.value.id,
+        booking_date: date.value,
+        start_time: bookingTime.start_time,
+        end_time: bookingTime.end_time,
+        hours: bookingTime.hours,
+        customer_name: `${lastName.value}, ${firstName.value} `,
+        customer_phone: phone.value,
+        customer_email: email.value,
+        players: players.value,
+        amount: courtSelected.value.price,
+        notes: `<div><strong>Players Notes:</strong> ${notes.value || 'None'}<br><strong>Total Hours:</strong> ${bookingTime.hours}<br><strong>Downpayment:</strong> ₱${downpayment >= 350 ? 350 : downpayment}<br><strong>Players:</strong> ${players.value}</div>`
+    }
+
+    await useBooking.createBooking(formData)
+
+    const result = await usePayment.submitPayment(amount * 100, bookingCode);
+
+    if (result?.data?.checkout_url) {
+        window.location.href = result.data.checkout_url;
+        confirmed.value = true
+    } else {
+        console.error("Checkout URL missing from response:", result);
+    }
+
 }
-
 
 async function selectVenue(slug) {
 
@@ -1619,10 +1538,6 @@ async function selectVenue(slug) {
 }
 
 
-/* ============================================================
-   LEAFLET MAP
-============================================================ */
-
 const initLeafletMap = currentVenue => {
 
     if (
@@ -1647,10 +1562,6 @@ const initLeafletMap = currentVenue => {
         return
     }
 
-
-    /*
-     * Destroy existing map first.
-     */
     if (map.value) {
 
         map.value.remove()
@@ -1658,16 +1569,6 @@ const initLeafletMap = currentVenue => {
         map.value = null
     }
 
-
-    /*
-     * FIXED:
-     *
-     * Previously:
-     * [venue.latitude, venue.latitude]
-     *
-     * Correct:
-     * [venue.latitude, venue.longitude]
-     */
     map.value =
         L.map(
             'leaflet-map'
@@ -1727,27 +1628,18 @@ const initLeafletMap = currentVenue => {
     ).openPopup()
 }
 
-
-/* ============================================================
-   MOUNT
-============================================================ */
-
 onMounted(async () => {
 
     const slug =
         route.params.slug ||
         localStorage.getItem('slug')
 
-
     if (!slug) {
-
         localStorage.removeItem(
             'slug'
         )
-
         return
     }
-
 
     activeSlug.value = slug
 
@@ -1756,35 +1648,21 @@ onMounted(async () => {
         slug
     )
 
-
     await selectVenue(
         activeSlug.value
     )
 
-
     await nextTick()
 
-
-    /*
-     * Give the map element a moment to
-     * exist before initializing Leaflet.
-     */
     setTimeout(() => {
-
         if (venue.value) {
             initLeafletMap(
                 venue.value
             )
         }
-
     }, 100)
 
 })
-
-
-/* ============================================================
-   CLEANUP
-============================================================ */
 
 onBeforeUnmount(() => {
 
@@ -2587,60 +2465,27 @@ button {
 
 }
 
-
-/* ============================================================
-   COURT GRID
-============================================================ */
-
 .court-grid {
     display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit,
-            minmax(250px,
-                1fr));
-
+    grid-template-columns: repeat(auto-fill, minmax(350px, 300px));
     gap: 20px;
 }
 
 
 .court-card {
     display: flex;
-
     flex-direction: column;
-
     width: 100%;
-
     text-align: left;
-
     padding: 0;
-
     overflow: hidden;
-
     cursor: pointer;
-
-    border:
-        1px solid rgba(0,
-            27,
-            62,
-            .10);
-
+    border: 1px solid rgba(0, 27, 62, .10);
     border-radius: 18px;
-
     background: white;
-
-    box-shadow:
-        0 8px 30px rgba(0,
-            27,
-            62,
-            .04);
-
-    transition:
-        transform .22s ease,
-        border-color .22s ease,
-        box-shadow .22s ease;
+    box-shadow: 0 8px 30px rgba(0, 27, 62, .04);
+    transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
 }
-
 
 .court-card:hover {
     transform:
@@ -2671,11 +2516,8 @@ button {
 
 .court-thumb {
     position: relative;
-
     aspect-ratio: 1.55;
-
     overflow: hidden;
-
     background: var(--navy);
 }
 
@@ -3411,16 +3253,13 @@ button {
 
 
 .btn-lime {
-    background: var(--lime);
-
+    background: #D4ED5B;
     color: var(--navy);
 }
-
 
 .btn-lime:hover:not(:disabled) {
     background: #D4ED5B;
 }
-
 
 .map-cta {
     width: 100%;
@@ -3603,45 +3442,20 @@ button {
     font-weight: 700;
 }
 
-
 .btn-close {
     width: 36px;
     height: 36px;
-
+    color: black;
     display: flex;
-
     align-items: center;
     justify-content: center;
-
     flex-shrink: 0;
-
-    border:
-        1px solid rgba(244,
-            247,
-            234,
-            .15);
-
+    border: 1px solid rgba(244, 247, 234, .15);
     border-radius: 9px;
-
-    background:
-        rgba(244,
-            247,
-            234,
-            .06);
-
-    color:
-        rgba(244,
-            247,
-            234,
-            .75);
-
+    background: rgba(244, 247, 234, .06);
     cursor: pointer;
-
-    transition:
-        background .2s ease,
-        color .2s ease;
+    transition: background .2s ease, color .2s ease;
 }
-
 
 .btn-close:hover {
     background:

@@ -45,7 +45,6 @@ export const useVenueStore = defineStore('venuesStore', () => {
             return 'Cannot connect to the server.';
         }
     }
-    // /view/venue/slugs
 
     const getList = async () => {
         const response = await api.get('list/venue')

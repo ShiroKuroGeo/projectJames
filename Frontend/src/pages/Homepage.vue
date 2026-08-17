@@ -6,6 +6,7 @@ import { image } from '@/utils/image';
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 import logo from '@/component/assets/logo.jpg'
+import CheckReservation from './CheckReservation.vue';
 
 const stats = ref([])
 
@@ -132,8 +133,9 @@ onMounted(async () => {
                     <img :src="logo" class="logo-mark" alt="">
                     <span>Court-<span style="color: white;">tesy</span></span>
                 </div>
+
                 <div class="nav-actions">
-                    <a class="btn btn-solid" href="#">Confirm Booking</a>
+                    <button class="btn btn-solid" href="#" @click="router.push({ name: 'checkreservation' })">Confirm Booking</button>
                     <a class="btn btn-solid" href="#">Login</a>
                 </div>
             </nav>
@@ -393,7 +395,6 @@ img {
     padding: 0 32px;
 }
 
-/* ===== NAV ===== */
 header {
     position: sticky;
     top: 0;
@@ -509,9 +510,40 @@ nav {
     background: #d3ec5c;
 }
 
-@media(max-width: 960px) {
-    .nav-links {
-        display: none;
+@media (max-width: 600px) {
+    nav {
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .logo {
+        gap: 7px;
+        font-size: 15px;
+        flex-shrink: 1;
+        min-width: 0;
+    }
+
+    .logo-mark {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        flex-shrink: 0;
+    }
+
+    .logo-mark::before {
+        width: 10px;
+        height: 10px;
+    }
+
+    .nav-actions {
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .btn {
+        padding: 8px 10px;
+        font-size: 11px;
+        border-radius: 7px;
     }
 }
 

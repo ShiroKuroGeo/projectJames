@@ -315,7 +315,7 @@ class VenueServices
                 'slugs' => ['required', 'exists:venues,slugs']
             ]);
 
-            $venueBySlug = Venue::where('slugs', $validated['slugs'])->first();
+            $venueBySlug = Venue::with(['admins', 'courts'])->where('slugs', $validated['slugs'])->first();
 
             return response()->json([
                 'message' => 'Successfully retrieved venue by slugs.',
