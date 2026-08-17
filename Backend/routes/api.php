@@ -35,7 +35,6 @@ Route::get('/testingforbackend', function () {
 // For Payment Maya & Gcash
 Route::post('/checkout', [PaymentController::class, 'createCheckout']);
 
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [AuthController::class, 'users']);
 
