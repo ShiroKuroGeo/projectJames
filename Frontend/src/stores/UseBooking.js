@@ -4,15 +4,13 @@ import api from "@/api/axios";
 export const useBookingStore = defineStore('BookingStore', () => {
 
     const createBooking = async (data) => {
-        console.log(data);
-
-        return;
         try {
             const response = await api.post('create/booking', data);
             
             console.log(response.data);
             return response.data.message;
         } catch (err) {
+            console.log(err.message);
             alert(err.message);
             if (err.response) {
                 return err.response.data.message || 'Something went wrong.';
