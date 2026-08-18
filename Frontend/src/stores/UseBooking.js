@@ -9,6 +9,7 @@ export const useBookingStore = defineStore('BookingStore', () => {
             
             return response.data.message;
         } catch (err) {
+            alert(err.message);
             if (err.response) {
                 return err.response.data.message || 'Something went wrong.';
             }
