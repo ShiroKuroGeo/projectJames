@@ -96,13 +96,14 @@ const fetchVenues = async () => {
         {
             label: 'FACILITIES',
             value: response.length
-        },
-        {
-            label: 'COURTS LISTED',
-            value: response.reduce((total, venueAdmin) => {
-                return total + (venueAdmin.venue?.courts?.length ?? 0)
-            }, 0)
         }
+        // ,
+        // {
+        //     label: 'COURTS LISTED',
+        //     value: response.reduce((total, venueAdmin) => {
+        //         return total + (venueAdmin.venue?.courts?.length ?? 0)
+        //     }, 0)
+        // },
         // {
         //     label: 'STARTING RATE',
         //     value: lowestStartingPrice.length
@@ -636,7 +637,7 @@ nav {
 
 .stat-row {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
     gap: 1px;
     margin-top: 56px;
     background: rgba(196, 221, 65, 0.16);
