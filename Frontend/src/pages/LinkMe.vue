@@ -1492,6 +1492,8 @@ const confirmBooking = async () => {
 
     await useBooking.createBooking(formData)
 
+    return 0;
+
     const result = await usePayment.submitPayment(amount * 100, bookingCode);
 
     if (result?.data?.checkout_url) {
