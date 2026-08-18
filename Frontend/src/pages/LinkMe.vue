@@ -11,7 +11,7 @@
                     </span>
                 </router-link>
                 <div class="nav-right">
-                    <button v-if="courtSelected?.id" class="nav-book-btn" @click="openReservation(venue)">
+                    <button v-if="courtSelected?.id" class="nav-book-btn" @click="openReservation()">
                         Book a Court
                         <span>→</span>
                     </button>
@@ -228,7 +228,7 @@
                                 </strong>
                             </div>
                         </div>
-                        <button class="btn btn-lime map-cta" :disabled="!courtSelected?.id" @click="openReservation(venue)">
+                        <button class="btn btn-lime map-cta" :disabled="!courtSelected?.id" @click="openReservation()">
                             Book {{ courtSelected?.name || 'Court' }}
                             <span>→</span>
                         </button>
@@ -573,7 +573,7 @@
                         Home
                     </router-link>
 
-                    <router-link to="/venues">
+                    <router-link to="/">
                         Venues
                     </router-link>
 
@@ -889,6 +889,8 @@ function selectDate(cell) {
 
     timeLabel.value = ''
 
+    updateTimeDate();
+
     totalHours.value = 0
     nextTick(() => {
         document
@@ -1039,12 +1041,14 @@ function selectSlot(slot) {
     if (isAlreadySelected) {
         selectedSlots.value = []
         updateTimeLabel()
+        updateTimeDate()
         return
     }
 
     if (selectedSlots.value.length === 0) {
         selectedSlots.value = [slot]
         updateTimeLabel()
+        updateTimeDate()
         return
     }
 
@@ -1074,6 +1078,7 @@ function selectSlot(slot) {
     )
 
     updateTimeLabel()
+    updateTimeDate();
 }
 
 function clearSelectedTime() {
@@ -1087,66 +1092,99 @@ function clearSelectedTime() {
 
 
 function updateTimeLabel() {
-
-    if (
-        selectedSlots.value.length === 0
-    ) {
-
+    if (selectedSlots.value.length === 0) {
         timeLabel.value = ''
-
         totalHours.value = 0
-
         return
     }
 
-    const sorted = [
-        ...selectedSlots.value
-    ].sort(
+    const sorted = [...selectedSlots.value].sort(
         (a, b) =>
             convertToMinutes(a.time) -
             convertToMinutes(b.time)
     )
 
-    const startMinutes =
-        convertToMinutes(
-            sorted[0].time
-        )
+    const startTime = sorted[0].time
 
-    const lastSlotMinutes =
-        convertToMinutes(
-            sorted[
-                sorted.length - 1
-            ].time
-        )
+    const lastSlotMinutes = convertToMinutes(
+        sorted[sorted.length - 1].time
+    )
 
-    const isSingleSlot =
-        sorted.length === 1
+    // Each selected slot = 1 hour
+    const durationHours = sorted.length
 
-    const slotDurationMinutes = 60
+    // Last selected hour ends at :59
+    const endMinutes = lastSlotMinutes + 59
 
-    const endMinutes =
-        isSingleSlot
-            ? lastSlotMinutes + slotDurationMinutes
-            : lastSlotMinutes
+    const endTime = formatMinutesToTime(endMinutes)
 
-    const durationHours =
-        (endMinutes -
-            startMinutes) / 60
+    totalHours.value = durationHours
 
-    totalHours.value =
-        durationHours + 1
-
-    const startTime =
-        sorted[0].time
-
-    const endTime =
-        formatMinutesToTime(
-            endMinutes
-        )
-
-    timeLabel.value =
-        `${startTime} – ${endTime}`
+    timeLabel.value = `${startTime} – ${endTime}`
 }
+
+// function updateTimeLabel() {
+
+//     if (
+//         selectedSlots.value.length === 0
+//     ) {
+
+//         timeLabel.value = ''
+
+//         totalHours.value = 0
+
+//         return
+//     }
+
+//     const sorted = [
+//         ...selectedSlots.value
+//     ].sort(
+//         (a, b) =>
+//             convertToMinutes(a.time) -
+//             convertToMinutes(b.time)
+//     )
+
+//     const startMinutes =
+//         convertToMinutes(
+//             sorted[0].time
+//         )
+
+//     const lastSlotMinutes =
+//         convertToMinutes(
+//             sorted[
+//                 sorted.length - 1
+//             ].time
+//         )
+
+//     const isSingleSlot =
+//         sorted.length === 1
+
+//     const slotDurationMinutes = 60
+
+//     const endMinutes =
+//         isSingleSlot
+//             ? lastSlotMinutes + slotDurationMinutes
+//             : lastSlotMinutes
+
+//     const durationHours =
+//         (endMinutes -
+//             startMinutes) / 60
+
+//     totalHours.value = durationHours === 1
+//         ? 1
+//         : durationHours + 1
+
+//     const startTime =
+//         sorted[0].time
+
+//     const endTime =
+//         formatMinutesToTime(
+//             endMinutes
+//         )
+
+//     timeLabel.value =
+//         `${startTime} – ${endTime}`
+// }
 
 
 const bookingTotal = computed(() => {
@@ -1354,30 +1392,37 @@ function clearContactDetails() {
     notes.value = ''
 }
 
-const openReservation = async (venue) => {
+const updateTimeDate = async () => {
 
-    if (!courtSelected.value || !venue) {
+    let venue_id = venue.value?.id;
+    let court_id = selectedCourtId.value;
+    let booking_date = date.value;
+
+    const closeTimeCourt = await useCourt.courtCloseTime({ court_id: court_id, schedule: booking_date });
+
+    if (closeTimeCourt) {
+        blockedTimes.value = closeTimeCourt?.closed_times;
+    } else {
+        blockedTimes.value = []
+    }
+
+    const closingVenueDate = await useVenue.getVenueCloseDateById({ venue_id: venue_id })
+
+    if (closingVenueDate) {
+        venueClosedDates.value = closingVenueDate
+    } else {
+        venueClosedDates.value = [];
+    }
+
+}
+
+const openReservation = async () => {
+
+    if (!courtSelected.value) {
         return
     }
 
-
-    //
-
-
-    const closeTimeCourt = await useCourt.courtCloseTime({ court_id: 2, schedule: '2026-08-17' })
-    blockedTimes.value = closeTimeCourt.closed_times;
-
-// reservedTimes.value
-// blockedTimes.value
-
-// court_id
-// schedule
-
-    // return;
-
-    const closingVenueDate = await useVenue.getVenueCloseDateById({ venue_id: venue?.id })
-
-    venueClosedDates.value = closingVenueDate
+    updateTimeDate();
 
     confirmed.value = false
 
