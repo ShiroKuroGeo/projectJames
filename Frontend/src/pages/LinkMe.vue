@@ -372,7 +372,10 @@
                                 {{ dateLabel }}
                             </div>
                             <div class="slot-grid">
-                                <button v-for="s in slots" :key="s.time" type="button" class="slot" :class="{
+                                <div class="" v-show="selectTimeReload">
+                                    Fetching. Please wait...
+                                </div>
+                                <button v-for="s in slots" v-show="!selectTimeReload" :key="s.time" type="button" class="slot" :class="{
                                     taken: s.taken,
                                     reserved: s.reserved,
                                     blocked: s.blocked,
@@ -432,7 +435,11 @@
                                 </div>
                             </div>
 
-                            <div class="form-card">
+                            <div class="" v-show="selectTimeReload">
+                                Fetching. Please wait...
+                            </div>
+
+                            <div class="form-card" v-show="!selectTimeReload">
                                 <div class="form-field">
                                     <label class="form-label mono">
                                         First name
@@ -510,6 +517,8 @@
                                         placeholder="Anything the court staff should know?"></textarea>
                                 </div>
                             </div>
+
+
                         </section>
                         <div v-if="!canConfirmBooking" class="booking-hint">
                             <span>!</span>
@@ -659,6 +668,7 @@ const route = useRoute()
 const venue = ref(null)
 const courts = ref([])
 const loadingCourts = ref(false)
+const selectTimeReload = ref(false)
 const isOpen = ref(false)
 const confirmed = ref(false)
 const activeSlug = ref('')
@@ -1421,6 +1431,8 @@ const updateTimeDate = async () => {
     let court_id = selectedCourtId.value;
     let booking_date = date.value;
 
+    selectTimeReload.value = true;
+
     const closeTimeCourt = await useCourt.courtCloseTime({ court_id: court_id, schedule: booking_date });
 
     if (closeTimeCourt) {
@@ -1430,12 +1442,14 @@ const updateTimeDate = async () => {
     }
 
     const reservedTimeCourt = await useBooking.getReservation({ venue_id: venue_id, court_id: court_id, booking_date: booking_date })
-    console.log(reservedTimeCourt)
+    
     if (reservedTimeCourt) {
         reservedTimes.value = reservedTimeCourt;
     } else {
         reservedTimes.value = []
     }
+
+    selectTimeReload.value = false;
 
     const closingVenueDate = await useVenue.getVenueCloseDateById({ venue_id: venue_id })
 
