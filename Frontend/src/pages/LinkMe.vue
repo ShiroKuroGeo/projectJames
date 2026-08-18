@@ -442,7 +442,7 @@
                             <div class="form-card" v-show="!selectTimeReload">
                                 <div class="form-field">
                                     <label class="form-label mono">
-                                        First name
+                                        First name <span style="color: red;">*</span> 
                                     </label>
                                     <input v-model="firstName" type="text" class="form-input" placeholder="Juan"
                                         autocomplete="given-name" />
@@ -451,7 +451,7 @@
                                 <div class="form-field">
 
                                     <label class="form-label mono">
-                                        Last name
+                                        Last name <span style="color: red;">*</span> 
                                     </label>
 
                                     <input v-model="lastName" type="text" class="form-input" placeholder="Dela Cruz"
@@ -461,7 +461,7 @@
 
                                 <div class="form-field">
                                     <label class="form-label mono">
-                                        Phone number
+                                        Phone number <span style="color: red;">*</span> 
                                     </label>
                                     <input v-model="phone" type="tel" class="form-input" placeholder="09XX XXX XXXX"
                                         autocomplete="tel" />
