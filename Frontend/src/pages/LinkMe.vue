@@ -1074,14 +1074,14 @@ function selectSlot(slot) {
     if (isAlreadySelected) {
         selectedSlots.value = []
         updateTimeLabel()
-        updateTimeDate()
+        // updateTimeDate()
         return
     }
 
     if (selectedSlots.value.length === 0) {
         selectedSlots.value = [slot]
         updateTimeLabel()
-        updateTimeDate()
+        // updateTimeDate()
         return
     }
 
@@ -1111,7 +1111,7 @@ function selectSlot(slot) {
     )
 
     updateTimeLabel()
-    updateTimeDate();
+    // updateTimeDate();
 }
 
 function clearSelectedTime() {
@@ -1553,9 +1553,7 @@ const confirmBooking = async () => {
     clicked = true;
 
     const bookingTime = getBookingTime(selectedSlots.value);
-    // const downpayment = (bookingTime.hours * courtSelected.value.price) * .5;
     const bookingCode = generateBookingCode();
-    // const amount = bookingTime.hours <= 2 ? downpayment : 350;
 
     const downpayment = courtSelected.value.price / 2;
     const amount = bookingTime.hours <= 2 ? downpayment : courtSelected.value.price;
@@ -1571,7 +1569,7 @@ const confirmBooking = async () => {
         customer_name: `${lastName.value}, ${firstName.value} `,
         customer_phone: phone.value,
         customer_email: email.value,
-        players: players.value,
+        players: players.value, 
         amount: courtSelected.value.price,
         notes: `<div><strong>Players Notes:</strong> ${notes.value || 'None'}<br><strong>Total Hours:</strong> ${bookingTime.hours}<br><strong>Downpayment:</strong> ₱${downpayment >= 350 ? 350 : downpayment}<br><strong>Players:</strong> ${players.value}</div>`
     }
