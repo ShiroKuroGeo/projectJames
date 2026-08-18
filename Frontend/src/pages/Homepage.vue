@@ -6,7 +6,6 @@ import { image } from '@/utils/image';
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 import logo from '@/component/assets/logo.jpg'
-import CheckReservation from './CheckReservation.vue';
 
 const stats = ref([])
 
@@ -133,10 +132,9 @@ onMounted(async () => {
                     <img :src="logo" class="logo-mark" alt="">
                     <span>Court-<span style="color: white;">tesy</span></span>
                 </div>
-
                 <div class="nav-actions">
                     <button class="btn btn-solid" href="#" @click="router.push({ name: 'checkreservation' })">Confirm Booking</button>
-                    <a class="btn btn-solid" href="#">Login</a>
+                    <button class="btn btn-solid" href="#" @click="router.push({ name: 'admin-login' })">Login</button>
                 </div>
             </nav>
         </header>

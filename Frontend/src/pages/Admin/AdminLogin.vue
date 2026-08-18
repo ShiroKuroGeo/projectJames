@@ -1,11 +1,9 @@
 <template>
     <div class="auth-page">
 
-        <!-- LOGIN -->
         <div class="auth-view" v-show="tab === 'login'">
             <div class="auth-grid">
 
-                <!-- LEFT BRAND PANEL -->
                 <section class="auth-brand">
                     <div class="brand-top">
                         <div class="logo">
@@ -51,22 +49,17 @@
                     </div>
                 </section>
 
-                <!-- LOGIN PANEL -->
                 <section class="auth-panel">
                     <div class="auth-card">
-
                         <div class="mobile-brand">
                             <div class="logo">
                                 <img :src="logo" class="logo-mark" alt="" />
                                 <span>Dink<span style="color: var(--navy);">Yard</span></span>
                             </div>
                         </div>
-
                         <div class="card-header">
                             <span class="card-eyebrow mono">Staff access</span>
-
                             <h2>Welcome<br><em>back.</em></h2>
-
                             <p>Sign in to manage the schedule for your venue.</p>
                         </div>
 
