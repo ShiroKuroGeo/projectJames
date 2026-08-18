@@ -4,6 +4,9 @@ import api from "@/api/axios";
 export const useBookingStore = defineStore('BookingStore', () => {
 
     const createBooking = async (data) => {
+        console.log(data);
+
+        return;
         try {
             const response = await api.post('create/booking', data);
             
