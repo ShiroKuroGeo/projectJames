@@ -1553,9 +1553,12 @@ const confirmBooking = async () => {
     clicked = true;
 
     const bookingTime = getBookingTime(selectedSlots.value);
-    const downpayment = (bookingTime.hours * courtSelected.value.price) * .5;
+    // const downpayment = (bookingTime.hours * courtSelected.value.price) * .5;
     const bookingCode = generateBookingCode();
-    const amount = bookingTime.hours <= 2 ? downpayment : 350;
+    // const amount = bookingTime.hours <= 2 ? downpayment : 350;
+
+    const downpayment = courtSelected.value.price / 2;
+    const amount = bookingTime.hours <= 2 ? downpayment : courtSelected.value.price;
 
     const formData = {
         booking_code: bookingCode,
