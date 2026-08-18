@@ -7,6 +7,7 @@ export const useBookingStore = defineStore('BookingStore', () => {
         try {
             const response = await api.post('create/booking', data);
             
+            console.log(response.data);
             return response.data.message;
         } catch (err) {
             alert(err.message);
