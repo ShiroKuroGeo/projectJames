@@ -3,5 +3,5 @@ export const image = (url) => {
         return '/default-avatar.png'
     }
 
-    return `http://127.0.0.1:8000/storage/${url}`
+    return `https://projectjames-production.up.railway.app/storage/${url}`
 }
