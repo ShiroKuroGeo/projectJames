@@ -644,7 +644,7 @@ nav {
     border: 1px solid rgba(196, 221, 65, 0.16);
     border-radius: 14px;
     overflow: hidden;
-    max-width: 560px;
+    max-width: 360px;
 }
 
 .stat-cell {
