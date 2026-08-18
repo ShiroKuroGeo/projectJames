@@ -29,7 +29,7 @@
                     </h1>
 
                     <p class="card-description">
-                        Add a new sports venue to DinkYard.
+                        Add a new sports venue to Courttesy.
                     </p>
                 </div>
 

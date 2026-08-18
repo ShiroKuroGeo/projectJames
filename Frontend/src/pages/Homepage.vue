@@ -235,7 +235,7 @@ onMounted(async () => {
                     <span class="kicker mono">BUILT FOR THE GAME</span>
                     <h2>Smarter court booking, from search to play</h2>
                     <p>
-                        DinkYard brings players and court owners together with a simpler way to discover,
+                        Courttesy brings players and court owners together with a simpler way to discover,
                         reserve, and manage courts.
                     </p>
                 </div>
@@ -283,7 +283,7 @@ onMounted(async () => {
                     <span class="kicker mono">BUILT TOGETHER</span>
                     <h2>One place for every game</h2>
                     <p>
-                        DinkYard connects players, court owners, and communities through a simpler
+                        Courttesy connects players, court owners, and communities through a simpler
                         way to discover, book, and manage courts.
                     </p>
                 </div>

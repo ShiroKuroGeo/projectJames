@@ -1,23 +1,14 @@
 <template>
     <div class="check-reservation-page">
 
-        <!-- =========================================================
-             BACKGROUND
-        ========================================================== -->
         <div class="background-grid" aria-hidden="true"></div>
 
-        <!-- =========================================================
-             HEADER
-        ========================================================== -->
         <header class="site-header">
             <nav class="nav">
 
                 <router-link to="/" class="brand">
                     <img :src="dinkYard" alt="DinkYard" class="brand-mark" />
-
-                    <span class="brand-name">
-                        Dink<span>Yard</span>
-                    </span>
+                    <span>Court-<span style="color: white;">tesy</span></span>
                 </router-link>
 
                 <div class="nav-actions">
@@ -74,7 +65,8 @@
                         </div>
 
                         <div class="card-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
                                 <rect x="3" y="4" width="18" height="17" rx="2" />
                                 <line x1="8" y1="2" x2="8" y2="6" />
                                 <line x1="16" y1="2" x2="16" y2="6" />
@@ -99,7 +91,8 @@
 
                             <div class="input-wrap">
 
-                                <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
                                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2
                                         19.79 19.79 0 0 1-8.63-3.07
                                         19.5 19.5 0 0 1-6-6
@@ -114,7 +107,8 @@
                                         A2 2 0 0 1 22 16.92z" />
                                 </svg>
 
-                                <input v-model="lookupPhone" type="tel" class="form-input" placeholder="09XX XXX XXXX" autocomplete="tel" @keyup.enter="handleSearch" />
+                                <input v-model="lookupPhone" type="tel" class="form-input" placeholder="09XX XXX XXXX"
+                                    autocomplete="tel" @keyup.enter="handleSearch" />
 
                             </div>
 
@@ -131,7 +125,8 @@
 
                             <div class="input-wrap">
 
-                                <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
                                     <path d="M20.59 13.41
                                         13.41 20.59
                                         a2 2 0 0 1-2.82 0
@@ -145,7 +140,8 @@
                                     <circle cx="9" cy="9" r="1.5" />
                                 </svg>
 
-                                <input v-model="lookupCode" type="text" class="form-input mono" placeholder="DY-XXXXXX" @keyup.enter="handleSearch" />
+                                <input v-model="lookupCode" type="text" class="form-input mono" placeholder="DY-XXXXXX"
+                                    @keyup.enter="handleSearch" />
 
                             </div>
 
@@ -168,7 +164,8 @@
                             Searching...
                         </span>
 
-                        <svg v-if="!searching" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg v-if="!searching" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="7" />
                             <path d="m20 20-4-4" />
                         </svg>
@@ -233,7 +230,8 @@
 
                         <div class="empty-icon">
 
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.6">
                                 <circle cx="11" cy="11" r="7" />
 
                                 <path d="m20 20-4-4" />
@@ -318,7 +316,8 @@
 
                                     <div class="reservation-time mono">
 
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="1.8">
                                             <circle cx="12" cy="12" r="9" />
 
                                             <path d="M12 7v5l3 2" />
@@ -453,7 +452,8 @@
 
                                         <div class="location-icon">
 
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="1.8">
                                                 <path d="M20 10
                                                     c0 5-8 11-8 11
                                                     S4 15 4 10
@@ -543,7 +543,7 @@
                 <div class="footer-meta">
 
                     <span>
-                        © 2026 DinkYard. All rights reserved.
+                        © 2026 Courttesy. All rights reserved.
                     </span>
 
                     <span class="footer-status">

@@ -132,7 +132,7 @@
                         <h1>Join the<br><em>yard.</em></h1>
 
                         <p class="lede">
-                            DinkYard accounts are created by a super admin
+                            Courttesy accounts are created by a super admin
                             to keep venue access secure.
                         </p>
                     </div>

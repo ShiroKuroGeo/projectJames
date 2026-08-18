@@ -1774,11 +1774,6 @@ const year =
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-
-/* ============================================================
-   ROOT
-============================================================ */
-
 .page {
     --navy: #001B3E;
     --navy-2: #04264F;
