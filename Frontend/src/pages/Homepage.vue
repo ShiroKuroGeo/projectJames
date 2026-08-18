@@ -102,14 +102,14 @@ const fetchVenues = async () => {
             value: response.reduce((total, venueAdmin) => {
                 return total + (venueAdmin.venue?.courts?.length ?? 0)
             }, 0)
-        },
-        {
-            label: 'STARTING RATE',
-            value: lowestStartingPrice.length
-                ? Math.min(...lowestStartingPrice)
-                : 350,
-            isCurrency: true
-        },
+        }
+        // {
+        //     label: 'STARTING RATE',
+        //     value: lowestStartingPrice.length
+        //         ? Math.min(...lowestStartingPrice)
+        //         : 350,
+        //     isCurrency: true
+        // },
     ]
     courts.value = response;
 }
