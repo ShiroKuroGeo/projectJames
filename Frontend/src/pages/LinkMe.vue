@@ -30,7 +30,8 @@
                 </div>
                 <div v-if="venue" class="venue-header-grid">
                     <div class="venue-logo-wrap">
-                        <img :src="image(venue?.admins[0]?.image)" :alt="`${venue?.name || 'Venue'} logo`" class="venue-logo" loading="eager" />
+                        <img :src="image(venue?.admins[0]?.image)" :alt="`${venue?.name || 'Venue'} logo`"
+                            class="venue-logo" loading="eager" />
                         <div class="logo-status">
                             <span></span>
                             OPEN FOR BOOKINGS
@@ -104,16 +105,23 @@
                             <svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
                                 <rect width="400" height="250" :fill="court.base || '#052A54'" />
                                 <defs>
-                                    <pattern :id="`courtPattern-${court.id}`" width="24" height="24" patternUnits="userSpaceOnUse">
-                                        <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#C3DD41" stroke-width="0.7" opacity="0.08" />
+                                    <pattern :id="`courtPattern-${court.id}`" width="24" height="24"
+                                        patternUnits="userSpaceOnUse">
+                                        <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#C3DD41" stroke-width="0.7"
+                                            opacity="0.08" />
                                     </pattern>
                                 </defs>
                                 <rect width="400" height="250" :fill="`url(#courtPattern-${court.id})`" />
-                                <rect x="18" y="18" width="364" height="214" rx="3" fill="none" stroke="#FBFCF7" stroke-width="2" opacity="0.9" />
-                                <line x1="200" y1="18" x2="200" y2="232" stroke="#FBFCF7" stroke-width="2" stroke-dasharray="8 7" opacity="0.5" />
-                                <line x1="105" y1="18" x2="105" y2="232" stroke="#FBFCF7" stroke-width="1.5" opacity="0.55" />
-                                <line x1="295" y1="18" x2="295" y2="232" stroke="#FBFCF7" stroke-width="1.5" opacity="0.55" />
-                                <line x1="18" y1="125" x2="382" y2="125" stroke="#FBFCF7" stroke-width="1.2" opacity="0.25" />
+                                <rect x="18" y="18" width="364" height="214" rx="3" fill="none" stroke="#FBFCF7"
+                                    stroke-width="2" opacity="0.9" />
+                                <line x1="200" y1="18" x2="200" y2="232" stroke="#FBFCF7" stroke-width="2"
+                                    stroke-dasharray="8 7" opacity="0.5" />
+                                <line x1="105" y1="18" x2="105" y2="232" stroke="#FBFCF7" stroke-width="1.5"
+                                    opacity="0.55" />
+                                <line x1="295" y1="18" x2="295" y2="232" stroke="#FBFCF7" stroke-width="1.5"
+                                    opacity="0.55" />
+                                <line x1="18" y1="125" x2="382" y2="125" stroke="#FBFCF7" stroke-width="1.2"
+                                    opacity="0.25" />
                                 <circle cx="200" cy="125" r="11" :fill="court.ball || '#C3DD41'" />
                                 <circle cx="197" cy="122" r="3" fill="#FFFFFF" opacity="0.45" />
                             </svg>
@@ -255,7 +263,8 @@
                                 Reserve Your Court
                             </h3>
                         </div>
-                        <button type="button" class="btn-close" @click="closeReservation" aria-label="Close reservation">
+                        <button type="button" class="btn-close" @click="closeReservation"
+                            aria-label="Close reservation">
                             ✕
                         </button>
                     </div>
@@ -264,10 +273,14 @@
                             <div class="booking-court-visual">
                                 <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
                                     <rect width="120" height="80" rx="6" :fill="courtSelected?.base || '#052A54'" />
-                                    <rect x="7" y="7" width="106" height="66" fill="none" stroke="#C3DD41" stroke-width="1.5" />
-                                    <line x1="60" y1="7" x2="60" y2="73" stroke="#C3DD41" stroke-width="1" stroke-dasharray="3 3" />
-                                    <line x1="31" y1="7" x2="31" y2="73" stroke="#C3DD41" stroke-width="1" opacity=".5" />
-                                    <line x1="89" y1="7" x2="89" y2="73" stroke="#C3DD41" stroke-width="1" opacity=".5" />
+                                    <rect x="7" y="7" width="106" height="66" fill="none" stroke="#C3DD41"
+                                        stroke-width="1.5" />
+                                    <line x1="60" y1="7" x2="60" y2="73" stroke="#C3DD41" stroke-width="1"
+                                        stroke-dasharray="3 3" />
+                                    <line x1="31" y1="7" x2="31" y2="73" stroke="#C3DD41" stroke-width="1"
+                                        opacity=".5" />
+                                    <line x1="89" y1="7" x2="89" y2="73" stroke="#C3DD41" stroke-width="1"
+                                        opacity=".5" />
                                     <circle cx="60" cy="40" r="4" fill="#C3DD41" />
                                 </svg>
                             </div>
@@ -326,11 +339,12 @@
                                     </span>
                                 </div>
                                 <div class="cal-grid">
-                                    <div v-for="(cell, i) in calendarCells" :key="i" class="cal-day" :class="cellClass(cell)" @click="
-                                        cell &&
-                                        !isDateBlocked(cell) &&
-                                        selectDate(cell)
-                                        ">
+                                    <div v-for="(cell, i) in calendarCells" :key="i" class="cal-day"
+                                        :class="cellClass(cell)" @click="
+                                            cell &&
+                                            !isDateBlocked(cell) &&
+                                            selectDate(cell)
+                                            ">
                                         {{ cell ? cell.day : '' }}
                                     </div>
                                 </div>
@@ -373,7 +387,8 @@
                                     <span v-else-if="s.blocked" class="slot-status">
                                         Blocked
                                     </span>
-                                    <span v-else-if="selectedSlots.some(selected => selected.time === s.time)" class="slot-status">
+                                    <span v-else-if="selectedSlots.some(selected => selected.time === s.time)"
+                                        class="slot-status">
                                         Selected
                                     </span>
                                     <span v-else class="slot-status">
@@ -422,7 +437,8 @@
                                     <label class="form-label mono">
                                         First name
                                     </label>
-                                    <input v-model="firstName" type="text" class="form-input" placeholder="Juan" autocomplete="given-name" />
+                                    <input v-model="firstName" type="text" class="form-input" placeholder="Juan"
+                                        autocomplete="given-name" />
                                 </div>
 
                                 <div class="form-field">
@@ -431,7 +447,8 @@
                                         Last name
                                     </label>
 
-                                    <input v-model="lastName" type="text" class="form-input" placeholder="Dela Cruz" autocomplete="family-name" />
+                                    <input v-model="lastName" type="text" class="form-input" placeholder="Dela Cruz"
+                                        autocomplete="family-name" />
 
                                 </div>
 
@@ -439,7 +456,8 @@
                                     <label class="form-label mono">
                                         Phone number
                                     </label>
-                                    <input v-model="phone" type="tel" class="form-input" placeholder="09XX XXX XXXX" autocomplete="tel" />
+                                    <input v-model="phone" type="tel" class="form-input" placeholder="09XX XXX XXXX"
+                                        autocomplete="tel" />
                                 </div>
 
                                 <div class="form-field">
@@ -449,7 +467,8 @@
                                             optional
                                         </span>
                                     </label>
-                                    <input v-model="email" type="email" class="form-input" placeholder="juan@email.com" autocomplete="email" />
+                                    <input v-model="email" type="email" class="form-input" placeholder="juan@email.com"
+                                        autocomplete="email" />
                                 </div>
 
                                 <div class="form-field">
@@ -460,7 +479,8 @@
 
                                     <div class="stepper">
 
-                                        <button type="button" class="stepper-btn" @click="decPlayers" :disabled="players <= 2">
+                                        <button type="button" class="stepper-btn" @click="decPlayers"
+                                            :disabled="players <= 2">
                                             −
                                         </button>
 
@@ -486,7 +506,8 @@
                                             optional
                                         </span>
                                     </label>
-                                    <textarea v-model="notes" class="form-input form-textarea" rows="3" placeholder="Anything the court staff should know?"></textarea>
+                                    <textarea v-model="notes" class="form-input form-textarea" rows="3"
+                                        placeholder="Anything the court staff should know?"></textarea>
                                 </div>
                             </div>
                         </section>
@@ -522,7 +543,8 @@
                                 <strong> ₱{{ bookingTotal }} </strong>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-lime confirm-btn" :disabled="!canConfirmBooking" @click="confirmBooking">
+                        <button type="button" class="btn btn-lime confirm-btn" :disabled="!canConfirmBooking"
+                            @click="confirmBooking">
                             {{ confirmed ? 'Court Held ✓' : 'Confirm & Pay' }}
                             <span v-if="!confirmed"> → </span>
                         </button>
@@ -550,7 +572,8 @@
 
                                 <circle cx="15" cy="15" r="6.5" fill="none" stroke="#001B3E" stroke-width="2" />
 
-                                <line x1="15" y1="4" x2="15" y2="26" stroke="#001B3E" stroke-width="1.2" stroke-dasharray="1.6 2.4" />
+                                <line x1="15" y1="4" x2="15" y2="26" stroke="#001B3E" stroke-width="1.2"
+                                    stroke-dasharray="1.6 2.4" />
                             </svg>
                         </div>
 
@@ -1404,6 +1427,14 @@ const updateTimeDate = async () => {
         blockedTimes.value = closeTimeCourt?.closed_times;
     } else {
         blockedTimes.value = []
+    }
+
+    const reservedTimeCourt = await useBooking.getReservation({ venue_id: venue_id, court_id: court_id, booking_date: booking_date })
+    console.log(reservedTimeCourt)
+    if (reservedTimeCourt) {
+        reservedTimes.value = reservedTimeCourt;
+    } else {
+        reservedTimes.value = []
     }
 
     const closingVenueDate = await useVenue.getVenueCloseDateById({ venue_id: venue_id })
