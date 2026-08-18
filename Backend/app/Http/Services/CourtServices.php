@@ -187,7 +187,7 @@ class CourtServices
                 $query->whereDate('closed_date', $request->input('schedule'));
             }
 
-            $courts = $query->get();
+            $courts = $query->first();
 
             return response()->json([
                 'message' => 'Courts time close retrieved successfully.',

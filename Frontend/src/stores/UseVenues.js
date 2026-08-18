@@ -30,7 +30,6 @@ export const useVenueStore = defineStore('venuesStore', () => {
 
     const getVenueBySlug = async (id) => {
         try {
-            console.log(id)
             const response = await api.post('view/venue/slugs', id)
 
             if (response.data.status === 200) return response.data.data;

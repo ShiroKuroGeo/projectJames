@@ -11,7 +11,7 @@
                     </span>
                 </router-link>
                 <div class="nav-right">
-                    <button v-if="courtSelected?.id" class="nav-book-btn" @click="openReservation">
+                    <button v-if="courtSelected?.id" class="nav-book-btn" @click="openReservation(venue)">
                         Book a Court
                         <span>→</span>
                     </button>
@@ -228,7 +228,7 @@
                                 </strong>
                             </div>
                         </div>
-                        <button class="btn btn-lime map-cta" :disabled="!courtSelected?.id" @click="openReservation">
+                        <button class="btn btn-lime map-cta" :disabled="!courtSelected?.id" @click="openReservation(venue)">
                             Book {{ courtSelected?.name || 'Court' }}
                             <span>→</span>
                         </button>
@@ -403,38 +403,26 @@
                         </section>
 
                         <section class="step">
-
                             <div class="step-head">
-
                                 <div class="step-number">
                                     03
                                 </div>
-
                                 <div>
-
                                     <span class="step-tag mono">
                                         PLAYER
                                     </span>
-
                                     <h2 class="step-title">
                                         Contact & players
                                     </h2>
-
                                 </div>
-
                             </div>
 
-
                             <div class="form-card">
-
                                 <div class="form-field">
-
                                     <label class="form-label mono">
                                         First name
                                     </label>
-
                                     <input v-model="firstName" type="text" class="form-input" placeholder="Juan" autocomplete="given-name" />
-
                                 </div>
 
                                 <div class="form-field">
@@ -448,29 +436,21 @@
                                 </div>
 
                                 <div class="form-field">
-
                                     <label class="form-label mono">
                                         Phone number
                                     </label>
-
                                     <input v-model="phone" type="tel" class="form-input" placeholder="09XX XXX XXXX" autocomplete="tel" />
-
                                 </div>
 
-
                                 <div class="form-field">
-
                                     <label class="form-label mono">
                                         Email
                                         <span class="optional">
                                             optional
                                         </span>
                                     </label>
-
                                     <input v-model="email" type="email" class="form-input" placeholder="juan@email.com" autocomplete="email" />
-
                                 </div>
-
 
                                 <div class="form-field">
 
@@ -485,27 +465,19 @@
                                         </button>
 
                                         <div class="stepper-value">
-
                                             <strong>
                                                 {{ players }}
                                             </strong>
-
                                             <span>
                                                 PLAYERS
                                             </span>
-
                                         </div>
-
                                         <button type="button" class="stepper-btn" @click="incPlayers">
                                             +
                                         </button>
-
                                     </div>
-
                                 </div>
 
-
-                                <!-- Notes -->
                                 <div class="form-field">
 
                                     <label class="form-label mono">
@@ -562,6 +534,8 @@
                 </aside>
             </Transition>
         </Teleport>
+
+
         <footer>
 
             <div class="wrap footer-inner">
@@ -1380,11 +1354,30 @@ function clearContactDetails() {
     notes.value = ''
 }
 
-function openReservation() {
+const openReservation = async (venue) => {
 
-    if (!courtSelected.value) {
+    if (!courtSelected.value || !venue) {
         return
     }
+
+
+    //
+
+
+    const closeTimeCourt = await useCourt.courtCloseTime({ court_id: 2, schedule: '2026-08-17' })
+    blockedTimes.value = closeTimeCourt.closed_times;
+
+// reservedTimes.value
+// blockedTimes.value
+
+// court_id
+// schedule
+
+    // return;
+
+    const closingVenueDate = await useVenue.getVenueCloseDateById({ venue_id: venue?.id })
+
+    venueClosedDates.value = closingVenueDate
 
     confirmed.value = false
 
@@ -1465,7 +1458,7 @@ const confirmBooking = async () => {
     }
 
     let clicked = false;
-    
+
     if (clicked) { alert('Too many attempts to click'); return };
     clicked = true;
 

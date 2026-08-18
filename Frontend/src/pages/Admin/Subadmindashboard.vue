@@ -24,6 +24,7 @@
                             </p>
                         </div>
                         <div class="court-tabs">
+                            {{ currentVenueId }}
                             <button v-for="c in managedVenues" :key="c.id" class="court-tab" :class="{ active: currentVenueId === c.id }" @click="changeVenue(c.id)">
                                 {{ c.name }}
                             </button>
@@ -112,7 +113,7 @@
                         </div>
                         <div class="cal-weekdays">
                             <span v-for="(d, i) in ['S', 'M', 'T', 'W', 'T', 'F', 'S']" :key="i">{{ d
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="cal-grid">
                             <div v-for="(cell, i) in calendarCells" :key="i" class="cal-day" :class="cellClass(cell)" @click="cell && !cell.disabled && toggleSchedule(cell)">
@@ -301,8 +302,6 @@ const getListVenues = async () => {
 function toggleExpand(code) {
     expandedCode.value = expandedCode.value === code ? null : code;
 }
-
-
 
 const cancelBooking = async (b) => {
     const result = await Swal.fire({

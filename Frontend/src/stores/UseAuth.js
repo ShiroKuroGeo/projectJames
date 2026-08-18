@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('Auth', () => {
     const login = async (email, password) => {
         try {
             const response = await api.post('login', { email, password });
-            console.log(response.data);
+            
             if (response.data.status !== 200) return response.data.message;
 
             token.value = response.data.token;
