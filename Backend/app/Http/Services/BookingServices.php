@@ -125,7 +125,7 @@ class BookingServices
             report($th);
 
             return response()->json([
-                'message' => 'Something is wrong. Please try again.',
+                'message' => $th->getMessage(),
                 'data' => $th->getMessage(),
                 'status' => 500,
             ], 500);
