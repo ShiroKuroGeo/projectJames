@@ -90,6 +90,7 @@ class BookingServices
 
             $booking = Booking::create([
                 ...$validated,
+                'payment_method' => 'gcash',
                 'payment_status' => $validated['payment_status'] ?? 'pending',
                 'status' => $validated['status'] ?? 'pending',
             ]);
@@ -125,7 +126,7 @@ class BookingServices
             report($th);
 
             return response()->json([
-                'message' => $th->getMessage(),
+                'message' => 'Something is wrong. Please try again.',
                 'data' => $th->getMessage(),
                 'status' => 500,
             ], 500);
