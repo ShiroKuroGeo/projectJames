@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class PaymongoWebhookController extends Controller
 {
-    private $bookingServices;
+    private BookingServices $bookingServices;
 
     public function __construct(BookingServices $bookingServices)
     {
@@ -17,60 +17,220 @@ class PaymongoWebhookController extends Controller
 
     public function handle(Request $request)
     {
+        $rawPayload = $request->getContent();
 
-        Log::debug('Paymongo webhook secret check', [
-            'secret_present' => !empty(env('PAYMONGO_WEBHOOK_SECRET')),
-            'secret_length' => strlen((string) env('PAYMONGO_WEBHOOK_SECRET')),
+        Log::info('PayMongo webhook received', [
+            'ip' => $request->ip(),
+            'content_length' => strlen($rawPayload),
         ]);
-        
-        if (!$this->isValidSignature($request)) {
-            Log::warning('PayMongo webhook: invalid signature');
-            return response()->json(['message' => 'Invalid signature'], 400);
+
+        if (!$this->isValidSignature($request, $rawPayload)) {
+            Log::warning('PayMongo webhook rejected: invalid signature');
+
+            return response()->json([
+                'message' => 'Invalid signature',
+            ], 400);
         }
 
-        $payload = $request->input('data.attributes.data');
-        $eventType = $request->input('data.attributes.type');
+        $event = json_decode($rawPayload, true);
 
-        // Only act on the event that means "checkout session paid"
+        if (!is_array($event)) {
+            Log::warning('PayMongo webhook rejected: invalid JSON');
+
+            return response()->json([
+                'message' => 'Invalid payload',
+            ], 400);
+        }
+
+        $eventType = data_get(
+            $event,
+            'data.attributes.type'
+        );
+
+        $eventId = data_get(
+            $event,
+            'data.id'
+        );
+
+        Log::info('PayMongo webhook event', [
+            'event_id' => $eventId,
+            'event_type' => $eventType,
+        ]);
+
         if ($eventType !== 'checkout_session.payment.paid') {
-            return response()->json(['message' => 'Event ignored'], 200);
+
+            Log::info('PayMongo webhook ignored', [
+                'event_id' => $eventId,
+                'event_type' => $eventType,
+            ]);
+
+            return response()->json([
+                'message' => 'Event ignored',
+            ], 200);
         }
 
-        $checkoutSession = $payload['attributes'] ?? [];
+        $checkoutSession = data_get(
+            $event,
+            'data.attributes.data.attributes',
+            []
+        );
+
+        if (!is_array($checkoutSession)) {
+
+            Log::warning(
+                'PayMongo webhook: checkout session data missing',
+                [
+                    'event_id' => $eventId,
+                ]
+            );
+
+            return response()->json([
+                'message' => 'Checkout session data missing',
+            ], 200);
+        }
+
         $payments = $checkoutSession['payments'] ?? [];
-        $latestPayment = $payments[0] ?? null;
 
-        if (!$latestPayment) {
-            Log::warning('PayMongo webhook: paid event with no payment data', ['payload' => $payload]);
-            return response()->json(['message' => 'No payment data'], 200);
+        if (!is_array($payments) || empty($payments)) {
+
+            Log::warning(
+                'PayMongo webhook: no payment found',
+                [
+                    'event_id' => $eventId,
+                ]
+            );
+
+            return response()->json([
+                'message' => 'No payment found',
+            ], 200);
         }
 
-        $bookingCode = $this->extractBookingCode($checkoutSession);
+        $payment = collect($payments)->first(function ($payment) {
 
-        $updatePayload = [
+            return data_get(
+                $payment,
+                'attributes.status'
+            ) === 'paid';
+        });
+
+        if (!$payment) {
+
+            Log::warning(
+                'PayMongo webhook: no paid payment found',
+                [
+                    'event_id' => $eventId,
+                ]
+            );
+
+            return response()->json([
+                'message' => 'No paid payment found',
+            ], 200);
+        }
+
+        $paymentId = data_get(
+            $payment,
+            'id'
+        );
+
+        $paymentStatus = data_get(
+            $payment,
+            'attributes.status'
+        );
+
+        $paymentMethod = data_get(
+            $payment,
+            'attributes.source.type'
+        );
+
+        $bookingCode = $this->extractBookingCode(
+            $checkoutSession
+        );
+
+        if (!$bookingCode) {
+
+            Log::error(
+                'PayMongo webhook: booking code missing',
+                [
+                    'event_id' => $eventId,
+                    'payment_id' => $paymentId,
+                ]
+            );
+
+            return response()->json([
+                'message' => 'Booking code missing',
+            ], 200);
+        }
+
+        Log::info('PayMongo payment confirmed', [
+            'event_id' => $eventId,
+            'payment_id' => $paymentId,
             'booking_code' => $bookingCode,
-            'payment_method' => $latestPayment['attributes']['source']['type'] ?? null,
-            'payment_status' => $latestPayment['attributes']['status'] ?? null,
-        ];
+            'payment_status' => $paymentStatus,
+            'payment_method' => $paymentMethod,
+        ]);
 
-        $this->bookingServices->attempUpdateAfterPayment($updatePayload);
+        try {
 
-        return response()->json(['message' => 'Webhook processed'], 200);
+            $updatePayload = [
+                'booking_code' => $bookingCode,
+                'payment_method' => $paymentMethod,
+                'payment_status' => $paymentStatus,
+                'payment_id' => $paymentId,
+            ];
+
+            $this->bookingServices
+                ->attempUpdateAfterPayment($updatePayload);
+        } catch (\Throwable $exception) {
+
+            Log::error(
+                'PayMongo webhook: booking update failed',
+                [
+                    'event_id' => $eventId,
+                    'payment_id' => $paymentId,
+                    'booking_code' => $bookingCode,
+                    'error' => $exception->getMessage(),
+                ]
+            );
+
+            return response()->json([
+                'message' => 'Webhook processing failed',
+            ], 500);
+        }
+
+        return response()->json([
+            'message' => 'Payment processed successfully',
+        ], 200);
     }
 
+    private function isValidSignature(
+        Request $request,
+        string $rawPayload
+    ): bool {
 
-    private function isValidSignature(Request $request): bool
-    {
-        $signatureHeader = $request->header('Paymongo-Signature');
-        $webhookSecret = env('PAYMONGO_WEBHOOK_SECRET');
+        $signatureHeader = $request->header(
+            'Paymongo-Signature'
+        );
+
+        $webhookSecret = config(
+            'services.paymongo.webhook_secret'
+        );
 
         if (!$signatureHeader || !$webhookSecret) {
+
+            Log::warning(
+                'PayMongo signature verification failed: missing credentials'
+            );
+
             return false;
         }
 
         $parts = [];
 
-        foreach (explode(',', $signatureHeader) as $pair) {
+        foreach (
+            explode(',', $signatureHeader)
+            as $pair
+        ) {
+
             [$key, $value] = array_pad(
                 explode('=', trim($pair), 2),
                 2,
@@ -84,60 +244,59 @@ class PaymongoWebhookController extends Controller
 
         $timestamp = $parts['t'] ?? null;
 
-        // Test mode first, live mode second
-        $expectedSig = $parts['te'] ?? $parts['li'] ?? null;
+        $expectedSignature =
+            $parts['te']
+            ?? $parts['li']
+            ?? null;
 
-        if (!$timestamp || !$expectedSig) {
+        if (!$timestamp || !$expectedSignature) {
+
+            Log::warning(
+                'PayMongo signature verification failed: invalid header'
+            );
+
             return false;
         }
 
-        $signedPayload = $timestamp . '.' . $request->getContent();
+        $signedPayload =
+            $timestamp . '.' . $rawPayload;
 
-        $computedSig = hash_hmac(
+        $computedSignature = hash_hmac(
             'sha256',
             $signedPayload,
             $webhookSecret
         );
 
         return hash_equals(
-            $expectedSig,
-            $computedSig
+            $expectedSignature,
+            $computedSignature
         );
     }
 
-    // private function isValidSignature(Request $request): bool
-    // {
-    //     $signatureHeader = $request->header('Paymongo-Signature');
-    //     $webhookSecret = env('PAYMONGO_WEBHOOK_SECRET');
+    private function extractBookingCode(
+        array $checkoutSession
+    ): ?string {
 
-    //     if (!$signatureHeader || !$webhookSecret) {
-    //         return false;
-    //     }
+        $successUrl = $checkoutSession['success_url'] ?? null;
 
-    //     $parts = [];
-    //     foreach (explode(',', $signatureHeader) as $pair) {
-    //         [$key, $value] = array_pad(explode('=', $pair, 2), 2, null);
-    //         $parts[$key] = $value;
-    //     }
+        if (!$successUrl) {
+            return null;
+        }
 
-    //     $timestamp = $parts['t'] ?? null;
-    //     $expectedSig = $parts['li'] ?? $parts['te'] ?? null;
+        $query = parse_url(
+            $successUrl,
+            PHP_URL_QUERY
+        );
 
-    //     if (!$timestamp || !$expectedSig) {
-    //         return false;
-    //     }
+        if (!$query) {
+            return null;
+        }
 
-    //     $signedPayload = $timestamp . '.' . $request->getContent();
-    //     $computedSig = hash_hmac('sha256', $signedPayload, $webhookSecret);
+        parse_str(
+            $query,
+            $params
+        );
 
-    //     return hash_equals($expectedSig, $computedSig);
-    // }
-
-    private function extractBookingCode(array $checkoutSession): ?string
-    {
-        $successUrl = $checkoutSession['success_url'] ?? '';
-        parse_str(parse_url($successUrl, PHP_URL_QUERY) ?? '', $query);
-
-        return $query['booking_code'] ?? null;
+        return $params['booking_code'] ?? null;
     }
 }
