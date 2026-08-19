@@ -51,6 +51,8 @@ class PaymongoWebhookController extends Controller
 
         return response()->json(['message' => 'Webhook processed'], 200);
     }
+
+
     private function isValidSignature(Request $request): bool
     {
         $signatureHeader = $request->header('Paymongo-Signature');
@@ -61,23 +63,69 @@ class PaymongoWebhookController extends Controller
         }
 
         $parts = [];
+
         foreach (explode(',', $signatureHeader) as $pair) {
-            [$key, $value] = array_pad(explode('=', $pair, 2), 2, null);
-            $parts[$key] = $value;
+            [$key, $value] = array_pad(
+                explode('=', trim($pair), 2),
+                2,
+                null
+            );
+
+            if ($key && $value) {
+                $parts[$key] = $value;
+            }
         }
 
         $timestamp = $parts['t'] ?? null;
-        $expectedSig = $parts['li'] ?? $parts['te'] ?? null;
+
+        // Test mode first, live mode second
+        $expectedSig = $parts['te'] ?? $parts['li'] ?? null;
 
         if (!$timestamp || !$expectedSig) {
             return false;
         }
 
         $signedPayload = $timestamp . '.' . $request->getContent();
-        $computedSig = hash_hmac('sha256', $signedPayload, $webhookSecret);
 
-        return hash_equals($expectedSig, $computedSig);
+        $computedSig = hash_hmac(
+            'sha256',
+            $signedPayload,
+            $webhookSecret
+        );
+
+        return hash_equals(
+            $expectedSig,
+            $computedSig
+        );
     }
+
+    // private function isValidSignature(Request $request): bool
+    // {
+    //     $signatureHeader = $request->header('Paymongo-Signature');
+    //     $webhookSecret = env('PAYMONGO_WEBHOOK_SECRET');
+
+    //     if (!$signatureHeader || !$webhookSecret) {
+    //         return false;
+    //     }
+
+    //     $parts = [];
+    //     foreach (explode(',', $signatureHeader) as $pair) {
+    //         [$key, $value] = array_pad(explode('=', $pair, 2), 2, null);
+    //         $parts[$key] = $value;
+    //     }
+
+    //     $timestamp = $parts['t'] ?? null;
+    //     $expectedSig = $parts['li'] ?? $parts['te'] ?? null;
+
+    //     if (!$timestamp || !$expectedSig) {
+    //         return false;
+    //     }
+
+    //     $signedPayload = $timestamp . '.' . $request->getContent();
+    //     $computedSig = hash_hmac('sha256', $signedPayload, $webhookSecret);
+
+    //     return hash_equals($expectedSig, $computedSig);
+    // }
 
     private function extractBookingCode(array $checkoutSession): ?string
     {
