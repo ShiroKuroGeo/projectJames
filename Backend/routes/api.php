@@ -24,15 +24,12 @@ Route::post('/check/booking', [BookingController::class, 'getCheckBookingReserva
 Route::post('/update/booking/status', [BookingController::class, 'getBookingReservationChangeById']);
 Route::post('/webhooks/paymongo', [PaymongoWebhookController::class, 'handle']);
 Route::post('/view/venue/slugs', [VenueController::class, 'getVenueBySlug']);
-
 Route::post('/create/user/newaccount', [UserController::class, 'createNewAccount']);
-
 Route::get('/testingforbackend', function () {
     $users = User::get();
     return response()->json(['status' => 'success', 'message' => 'Testing successful', 'data' => $users]);
 });
 
-// For Payment Maya & Gcash
 Route::post('/checkout', [PaymentController::class, 'createCheckout']);
 
 Route::middleware('auth:sanctum')->group(function () {
