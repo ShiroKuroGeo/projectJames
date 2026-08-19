@@ -37,19 +37,13 @@ Route::post('/checkout', [PaymentController::class, 'createCheckout']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [AuthController::class, 'users']);
-
-    // Venues API Routes
     Route::post('/create/venue', [VenueController::class, 'createVenue']);
     Route::post('/admin/create/venue', [VenueController::class, 'setVenueAdmin']);
     Route::get('/admin/list/venue', [VenueController::class, 'getAdminVenue']);
     Route::post('/admin/create/venue/closedate', [VenueController::class, 'setVenueCloseDate']);
     Route::post('/admin/remove/venue/closedate', [VenueController::class, 'removeVenueCloseDate']);
-
-    // Court API Routes
     Route::post('/admin/create/court', [CourtController::class, 'createCourt']);
     Route::post('/admin/create/court/closeTime', [CourtController::class, 'setCourtClosedTime']);
-
-    //Booking API Routes
     Route::get('/admin/list/booking', [BookingController::class, 'getMyAccount']);
     Route::get('/admin/review/booking', [BookingController::class, 'getBookingByCode']);
     Route::post('/admin/view/booking', [BookingController::class, 'getBookingByVenueId']);
