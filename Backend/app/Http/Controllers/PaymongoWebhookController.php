@@ -17,6 +17,12 @@ class PaymongoWebhookController extends Controller
 
     public function handle(Request $request)
     {
+
+        Log::debug('Paymongo webhook secret check', [
+            'secret_present' => !empty(env('PAYMONGO_WEBHOOK_SECRET')),
+            'secret_length' => strlen((string) env('PAYMONGO_WEBHOOK_SECRET')),
+        ]);
+        
         if (!$this->isValidSignature($request)) {
             Log::warning('PayMongo webhook: invalid signature');
             return response()->json(['message' => 'Invalid signature'], 400);
