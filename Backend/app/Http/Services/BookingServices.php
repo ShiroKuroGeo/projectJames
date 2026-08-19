@@ -133,7 +133,7 @@ class BookingServices
         }
     }
 
-    public function attempUpdateAfterPayment($request)
+    public function attempUpdateAfterPayment(Request $request)
     {
 
         try {
