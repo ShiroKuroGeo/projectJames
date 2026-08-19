@@ -17,8 +17,6 @@ class PaymongoWebhookController extends Controller
 
     public function handle(Request $request)
     {
-        Log::info('🔥 PAYMONGO WEBHOOK RECEIVED');
-        return;
         $rawPayload = $request->getContent();
 
         Log::info('PayMongo webhook received', [
