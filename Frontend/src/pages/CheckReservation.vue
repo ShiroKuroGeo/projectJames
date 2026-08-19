@@ -65,8 +65,7 @@
                         </div>
 
                         <div class="card-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="1.8">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                 <rect x="3" y="4" width="18" height="17" rx="2" />
                                 <line x1="8" y1="2" x2="8" y2="6" />
                                 <line x1="16" y1="2" x2="16" y2="6" />
@@ -91,8 +90,7 @@
 
                             <div class="input-wrap">
 
-                                <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="1.8">
+                                <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2
                                         19.79 19.79 0 0 1-8.63-3.07
                                         19.5 19.5 0 0 1-6-6
@@ -107,8 +105,7 @@
                                         A2 2 0 0 1 22 16.92z" />
                                 </svg>
 
-                                <input v-model="lookupPhone" type="tel" class="form-input" placeholder="09XX XXX XXXX"
-                                    autocomplete="tel" @keyup.enter="handleSearch" />
+                                <input v-model="lookupPhone" type="tel" class="form-input" placeholder="09XX XXX XXXX" autocomplete="tel" @keyup.enter="handleSearch" />
 
                             </div>
 
@@ -125,8 +122,7 @@
 
                             <div class="input-wrap">
 
-                                <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="1.8">
+                                <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                     <path d="M20.59 13.41
                                         13.41 20.59
                                         a2 2 0 0 1-2.82 0
@@ -140,8 +136,7 @@
                                     <circle cx="9" cy="9" r="1.5" />
                                 </svg>
 
-                                <input v-model="lookupCode" type="text" class="form-input mono" placeholder="DY-XXXXXX"
-                                    @keyup.enter="handleSearch" />
+                                <input v-model="lookupCode" type="text" class="form-input mono" placeholder="DY-XXXXXX" @keyup.enter="handleSearch" />
 
                             </div>
 
@@ -164,8 +159,7 @@
                             Searching...
                         </span>
 
-                        <svg v-if="!searching" width="17" height="17" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
+                        <svg v-if="!searching" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="7" />
                             <path d="m20 20-4-4" />
                         </svg>
@@ -199,9 +193,7 @@
                                 SEARCH RESULTS
                             </span>
 
-                            <h2>
-                                Your reservations
-                            </h2>
+                            <h2>Your reservations</h2>
 
                             <p>
                                 {{ results.length }}
@@ -209,29 +201,21 @@
                                 found for your search.
                             </p>
                         </div>
-
                         <div class="result-count">
                             <span class="count-number">
                                 {{ results.length }}
                             </span>
-
                             <span class="count-label mono">
                                 FOUND
                             </span>
                         </div>
-
                     </div>
 
-
-                    <!-- =================================================
-                         EMPTY RESULT
-                    ================================================== -->
                     <div v-if="results.length === 0" class="empty-card">
 
                         <div class="empty-icon">
 
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="1.6">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                                 <circle cx="11" cy="11" r="7" />
 
                                 <path d="m20 20-4-4" />
@@ -261,63 +245,37 @@
 
                     </div>
 
-
-                    <!-- =================================================
-                         RESERVATION LIST
-                    ================================================== -->
                     <div v-else class="reservation-list">
 
-                        <article v-for="r in results" :key="r.booking_code" class="reservation-card" :class="{
-                            expanded:
-                                selectedCode === r.booking_code
-                        }">
-
-                            <!-- MAIN ROW -->
-                            <button class="reservation-main" @click="
-                                toggleSelect(r.booking_code)
-                                ">
-
+                        <article v-for="r in results" :key="r.booking_code" class="reservation-card" :class="{ expanded: selectedCode === r.booking_code }">
+                            <button class="reservation-main" @click="toggleSelect(r.booking_code)">
                                 <div class="reservation-info">
-
                                     <div class="reservation-top">
-
                                         <span class="reservation-code mono">
                                             {{ r.booking_code }}
                                         </span>
-
                                         <span class="status-pill" :class="r.status">
                                             <span class="status-dot"></span>
                                             {{ r.status }}
                                         </span>
-
                                     </div>
-
-
                                     <h3 class="reservation-title">
-
                                         <span>
                                             {{ r.venue?.name }}
                                         </span>
-
                                         <span class="separator">
                                             /
                                         </span>
-
                                         <span class="court-name">
                                             {{ r.court?.name }}
                                         </span>
 
                                         <span v-if="r.court?.tag" class="court-tag mono">
-                                            {{ r.court.tag }}
+                                            {{ viewTags(r.court.tag) }}
                                         </span>
-
                                     </h3>
-
-
                                     <div class="reservation-time mono">
-
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="1.8">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                             <circle cx="12" cy="12" r="9" />
 
                                             <path d="M12 7v5l3 2" />
@@ -339,9 +297,6 @@
                                     </div>
 
                                 </div>
-
-
-                                <!-- RIGHT -->
                                 <div class="reservation-action">
 
                                     <span class="view-label mono">
@@ -359,62 +314,38 @@
                                     }">
                                         ↓
                                     </span>
-
                                 </div>
-
                             </button>
-
-
-                            <!-- =================================================
-                                 DETAILS
-                            ================================================== -->
                             <transition name="detail-expand">
 
                                 <div v-if="
                                     selectedCode ===
                                     r.booking_code
                                 " class="reservation-detail">
-
                                     <div class="detail-grid">
-
-                                        <!-- BOOKED BY -->
                                         <div class="detail-item">
-
                                             <span class="detail-label mono">
                                                 BOOKED BY
                                             </span>
-
                                             <span class="detail-value">
                                                 {{ r.customer_name || '—' }}
                                             </span>
-
                                         </div>
-
-
-                                        <!-- PLAYERS -->
                                         <div class="detail-item">
-
                                             <span class="detail-label mono">
                                                 PLAYERS
                                             </span>
-
                                             <span class="detail-value">
                                                 {{
                                                     extractPlayers(r.notes)
-                                                    || '—'
+                                                    || "-"
                                                 }}
                                             </span>
-
                                         </div>
-
-
-                                        <!-- DURATION -->
                                         <div class="detail-item">
-
                                             <span class="detail-label mono">
                                                 DURATION
                                             </span>
-
                                             <span class="detail-value">
                                                 {{ r.hours || '—' }}
                                                 {{
@@ -423,71 +354,43 @@
                                                         : 'hours'
                                                 }}
                                             </span>
-
                                         </div>
 
-
-                                        <!-- TOTAL -->
-                                        <div class="
-                                                detail-item
-                                                total-item
-                                            ">
-
+                                        <div class="detail-item">
                                             <span class="detail-label mono">
-                                                TOTAL
+                                                Reservation Date:
                                             </span>
-
                                             <span class="detail-price">
-                                                <!-- ₱{{ totalPrice(r) }} -->
-                                                <!-- {{ r.amount }} -->
+                                                {{ dateFormat(r.booking_date) }}
                                             </span>
 
                                         </div>
 
                                     </div>
-
-
-                                    <!-- LOCATION -->
                                     <div class="location-row">
-
                                         <div class="location-icon">
-
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="1.8">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                                 <path d="M20 10
                                                     c0 5-8 11-8 11
                                                     S4 15 4 10
                                                     a8 8 0 1 1 16 0z" />
 
                                                 <circle cx="12" cy="10" r="2.5" />
-
                                             </svg>
-
                                         </div>
-
                                         <div>
-
-                                            <span class="
-                                                    location-label
-                                                    mono
-                                                ">
+                                            <span class="location-label mono">
                                                 VENUE
                                             </span>
-
                                             <span class="location-value">
                                                 {{ r.venue?.name || '—' }}
-
                                                 <span v-if="r.venue?.area">
                                                     · {{ r.venue.area }}
                                                 </span>
                                             </span>
-
                                         </div>
-
                                     </div>
 
-
-                                    <!-- BOOKING CODE -->
                                     <div class="reference-row">
 
                                         <span class="mono">
@@ -514,10 +417,6 @@
 
         </main>
 
-
-        <!-- =========================================================
-             FOOTER
-        ========================================================== -->
         <footer class="site-footer">
 
             <div class="footer-inner">
@@ -536,27 +435,18 @@
                         A simpler way to discover, book, and manage
                         your favorite courts.
                     </p>
-
                 </div>
-
-
                 <div class="footer-meta">
-
                     <span>
                         © 2026 Courttesy. All rights reserved.
                     </span>
-
                     <span class="footer-status">
                         <span></span>
                         BOOKING SYSTEM ONLINE
                     </span>
-
                 </div>
-
             </div>
-
         </footer>
-
     </div>
 </template>
 
@@ -565,6 +455,7 @@
 import { ref } from 'vue';
 import dinkYard from '@/component/assets/logo.jpg';
 import { useBookingStore } from '@/stores/UseBooking';
+import { dateFormat } from '@/utils/dateformat';
 
 const lookupPhone = ref('');
 const lookupCode = ref('');
@@ -576,13 +467,6 @@ const results = ref([]);
 const selectedCode = ref(null);
 
 const useBooking = useBookingStore();
-
-
-/*
-|--------------------------------------------------------------------------
-| SEARCH RESERVATION
-|--------------------------------------------------------------------------
-*/
 
 const handleSearch = async () => {
 
@@ -624,11 +508,9 @@ const handleSearch = async () => {
 };
 
 
-/*
-|--------------------------------------------------------------------------
-| TOGGLE RESERVATION
-|--------------------------------------------------------------------------
-*/
+const viewTags = (tag) => {
+    return tag?.join(', ') ?? ''
+}
 
 function toggleSelect(code) {
 
@@ -639,30 +521,15 @@ function toggleSelect(code) {
 
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| EXTRACT PLAYERS
-|--------------------------------------------------------------------------
-*/
-
 const extractPlayers = (notes) => {
+    const text = notes?.replace(/<[^>]*>/g, ' ');
 
-    const match =
-        notes?.match(/total player of (\d+)/i);
+    const match = text?.match(/Players:\s*(\d+)/i);
 
     return match
         ? Number(match[1])
         : null;
-
 };
-
-
-/*
-|--------------------------------------------------------------------------
-| TOTAL PRICE
-|--------------------------------------------------------------------------
-*/
 
 const totalPrice = (reservation) => {
 
@@ -2150,17 +2017,6 @@ input {
 
 }
 
-
-.detail-price::first-letter {
-
-    color: var(--lime-2);
-
-}
-
-
-/* =========================================================
-   LOCATION
-========================================================= */
 
 .location-row {
 
