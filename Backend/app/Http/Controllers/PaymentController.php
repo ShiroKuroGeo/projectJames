@@ -25,7 +25,7 @@ class PaymentController extends Controller
                         'send_email_receipt' => true,
                         'show_description' => true,
                         'show_line_items' => true,
-                        'payment_method_types' => ['gcash', 'paymaya'],
+                        'payment_method_types' => ['qrph'],
                         'line_items' => [
                             [
                                 'currency' => 'PHP',
