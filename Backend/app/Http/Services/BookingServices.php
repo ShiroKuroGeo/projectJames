@@ -133,14 +133,60 @@ class BookingServices
         }
     }
 
-    public function attempUpdateAfterPayment(Request $request)
-    {
+    // public function attempUpdateAfterPayment(Request $request)
+    // {
 
+    //     try {
+
+    //         Booking::where('booking_code', $request->booking_code)->update([
+    //             'payment_method' => $request->payment_method,
+    //             'payment_status' => $request->payment_status,
+    //             'status' => 'confirmed',
+    //         ]);
+
+    //         return true;
+    //     } catch (ValidationException $e) {
+    //         return response()->json([
+    //             'message' => 'Validation Error.',
+    //             'errors' => $e->errors(),
+    //             'status' => 422,
+    //         ], 422);
+    //     } catch (\Illuminate\Database\QueryException $e) {
+    //         if ($e->getCode() === '23000') {
+    //             return response()->json([
+    //                 'message' => 'A booking with this code already exists.',
+    //                 'data' => [],
+    //                 'status' => 409,
+    //             ], 409);
+    //         }
+
+    //         report($e);
+
+    //         return response()->json([
+    //             'message' => 'Something is wrong. Please try again.',
+    //             'data' => [],
+    //             'status' => 500,
+    //         ], 500);
+    //     } catch (\Throwable $th) {
+    //         report($th);
+
+    //         return response()->json([
+    //             'message' => 'Something is wrong. Please try again.',
+    //             'data' => [],
+    //             'status' => 500,
+    //         ], 500);
+    //     }
+    // }
+
+
+
+    public function attempUpdateAfterPayment(array $data)
+    {
         try {
 
-            Booking::where('booking_code', $request->booking_code)->update([
-                'payment_method' => $request->payment_method,
-                'payment_status' => $request->payment_status,
+            Booking::where('booking_code', $data['booking_code'] ?? null)->update([
+                'payment_method' => $data['payment_method'] ?? null,
+                'payment_status' => $data['payment_status'] ?? null,
                 'status' => 'confirmed',
             ]);
 
@@ -177,7 +223,6 @@ class BookingServices
             ], 500);
         }
     }
-
 
     public function attemptGetBookingByCode(Request $request)
     {
