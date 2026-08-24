@@ -20,15 +20,8 @@
             </nav>
         </header>
 
-
-        <!-- =========================================================
-             MAIN
-        ========================================================== -->
         <main class="main-content">
 
-            <!-- =====================================================
-                 HERO / SEARCH
-            ====================================================== -->
             <section class="search-section">
 
                 <div class="search-copy">
@@ -49,8 +42,6 @@
 
                 </div>
 
-
-                <!-- SEARCH CARD -->
                 <div class="search-card">
 
                     <div class="card-header">
@@ -78,10 +69,8 @@
                         </div>
                     </div>
 
-
                     <div class="form-fields">
 
-                        <!-- PHONE -->
                         <div class="form-field">
 
                             <label class="form-label mono">
@@ -111,8 +100,6 @@
 
                         </div>
 
-
-                        <!-- BOOKING CODE -->
                         <div class="form-field">
 
                             <label class="form-label mono">
@@ -144,8 +131,6 @@
 
                     </div>
 
-
-                    <!-- SEARCH BUTTON -->
                     <button class="search-btn" :disabled="(!lookupPhone.trim() && !lookupCode.trim())
                         || searching
                         " @click="handleSearch">
@@ -177,15 +162,10 @@
 
             </section>
 
-
-            <!-- =====================================================
-                 RESULTS
-            ====================================================== -->
             <transition name="results-fade">
 
                 <section v-if="searched" class="results-section">
 
-                    <!-- RESULT HEADER -->
                     <div v-if="results.length" class="results-header">
 
                         <div>

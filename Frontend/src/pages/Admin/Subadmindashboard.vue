@@ -113,7 +113,7 @@
                         </div>
                         <div class="cal-weekdays">
                             <span v-for="(d, i) in ['S', 'M', 'T', 'W', 'T', 'F', 'S']" :key="i">{{ d
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="cal-grid">
                             <div v-for="(cell, i) in calendarCells" :key="i" class="cal-day" :class="cellClass(cell)" @click="cell && !cell.disabled && toggleSchedule(cell)">
@@ -215,8 +215,8 @@
                                             <span class="fact-value mono">{{ b.phone }}</span>
                                         </div>
                                         <div class="fact">
-                                            <span class="fact-label mono">Players</span>
-                                            <span class="fact-value">{{ b.players }}</span>
+                                            <span class="fact-label mono">Down Payment Status</span>
+                                            <span class="fact-value" style="text-transform: capitalize;">{{ b.paymentStatus }}</span>
                                         </div>
                                         <div class="fact">
                                             <span class="fact-label mono">Status</span>
@@ -228,6 +228,25 @@
                                         <span class="note-label mono">Note from customer</span>
                                         <p class="note-text" v-html="b.notes"></p>
                                     </div>
+
+
+                                    <div class="expand-note payment-proof" v-if="b.raw?.submitted_payment?.image">
+                                        <img :src="image(b.raw.submitted_payment.image)" alt="Payment proof" class="payment-proof-image" @click="openPaymentModal(b.raw.submitted_payment.image)">
+                                    </div>
+
+                                    <div v-if="showPaymentModal" class="payment-modal" @click.self="closePaymentModal">
+                                        <div class="payment-modal-content">
+                                            <button class="payment-modal-close" type="button" @click="closePaymentModal">
+                                                ×
+                                            </button>
+
+                                            <img v-if="selectedPaymentImage" :src="image(selectedPaymentImage)" alt="Payment proof" class="payment-modal-image">
+                                        </div>
+                                    </div>
+
+                                    <!-- <div class="expand-note">
+                                        <img :src="image(b.submitted_payment.image)" alt="">
+                                    </div> -->
 
                                     <div class="expand-actions">
                                         <button v-if="b.paymentStatus === 'downpayment'" class="action-btn primary" @click="markFullyPaid(b)">
@@ -264,6 +283,7 @@ import { useCourtStore } from '@/stores/UseCourt';
 import { useBookingStore } from '@/stores/UseBooking';
 import Swal from 'sweetalert2';
 import logo from '@/component/assets/logo.jpg';
+import { image } from '@/utils/image';
 
 const router = useRouter();
 const useVenue = useVenueStore();
@@ -441,6 +461,19 @@ const changeVenue = async (id) => {
 
     fetchCourtSchedule(response?.[0]?.id ?? 0)
     fetchVenueClosedDates(id);
+};
+
+const showPaymentModal = ref(false);
+const selectedPaymentImage = ref(null);
+
+const openPaymentModal = (image) => {
+    selectedPaymentImage.value = image;
+    showPaymentModal.value = true;
+};
+
+const closePaymentModal = () => {
+    showPaymentModal.value = false;
+    selectedPaymentImage.value = null;
 };
 
 const selectedCourt = async (id) => {
@@ -661,6 +694,7 @@ const mapBooking = (b) => ({
     paymentStatus: b.payment_status,
     paymentMethod: b.payment_method,
     notes: b.notes,
+    submitted_payment: b.submitted_payment,
     players: extractPlayers(b.notes),
     raw: b,
 });
@@ -696,10 +730,6 @@ onMounted(() => {
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
-/* =========================================================
-   TOKENS (shared with Homepage / AdminLogin)
-   ========================================================= */
 
 .admin-shell {
     --navy: #001B3E;
@@ -1667,5 +1697,59 @@ onMounted(() => {
         padding-left: 0;
         padding-top: 10px;
     }
+}
+
+
+.payment-proof-image {
+    width: 180px;
+    max-height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.payment-proof-image:hover {
+    transform: scale(1.03);
+}
+
+.payment-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.75);
+}
+
+.payment-modal-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.payment-modal-image {
+    display: block;
+    max-width: 90vw;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.payment-modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+
+    border: 0;
+    background: transparent;
+
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
 }
 </style>

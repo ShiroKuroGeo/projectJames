@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\BookingServices;
+use App\Http\Services\PaymentServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -10,10 +11,12 @@ use Illuminate\Support\Facades\Log;
 class PaymentController extends Controller
 {
     private $bookingServices;
+    private $paymentServices;
 
-    public function __construct(BookingServices $bookingServices)
+    public function __construct(BookingServices $bookingServices, PaymentServices $paymentServices)
     {
         $this->bookingServices = $bookingServices;
+        $this->paymentServices = $paymentServices;
     }
 
     public function createCheckout(Request $request)
@@ -64,5 +67,17 @@ class PaymentController extends Controller
             'data' => [],
             'errors' => $result['errors'] ?? [],
         ], $response->status());
+    }
+
+    public function getPaymentMethod(Request $request){
+        return $this->paymentServices->attemptGetPaymentMethod($request);
+    }
+
+    public function submitPayment(Request $request){
+        return $this->paymentServices->attemptSubmitPayment($request);
+    }
+
+    public function createPayment(Request $request){
+        return $this->paymentServices->attemptCreatePayment($request);
     }
 }

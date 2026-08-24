@@ -296,13 +296,15 @@ class BookingServices
     public function attemptGetBookingByVenueId(Request $request)
     {
         try {
-            $viewBooking = Booking::with(['venue', 'court'])->where('venue_id', $request->id)->get();
+
+            $viewBooking = Booking::with(['venue', 'court', 'submittedPayment'])->where('venue_id', $request->id)->orderBy('created_at', 'DESC')->get();
 
             return response()->json([
                 'message' => 'Successfully retrieved booking by Venues Id.',
                 'data' => $viewBooking,
                 'status' => 200,
             ], 200);
+
         } catch (\Throwable $th) {
             report($th);
 
@@ -388,6 +390,7 @@ class BookingServices
                 ->when($request->filled('customer_phone'), function ($q) use ($request) {
                     $q->where('customer_phone', $request->customer_phone);
                 })
+                ->orderBy('created_at', 'DESC')
                 ->get();
 
             return response()->json([

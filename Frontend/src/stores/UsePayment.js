@@ -13,6 +13,28 @@ export const usePaymentStore = defineStore('paymentStore', () => {
         }
     }
 
-    return { submitPayment }
+    const listPaymentMethod = async (id) => {
+        try {
+            const response = await api.post('list/payment/method', { bookingCode: id })
+
+            return response.data;
+        } catch (error) {
+            console.error('Get payment method failed: ', error)
+            throw error;
+        }
+    }
+
+    const submitPaymentQR = async (data) => {
+        try {
+            const response = await api.post('pay', data)
+
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            throw error
+        }
+    }
+
+    return { submitPayment, listPaymentMethod, submitPaymentQR }
 
 });

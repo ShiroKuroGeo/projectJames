@@ -25,15 +25,23 @@ class Booking extends Model
         'notes',
     ];
 
-    public function user (){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function venue (){
+    public function venue()
+    {
         return $this->belongsTo(Venue::class);
     }
 
-    public function court(){
+    public function court()
+    {
         return $this->belongsTo(Court::class);
+    }
+
+    public function submittedPayment()
+    {
+        return $this->hasOne(SubmittedPayment::class);
     }
 }

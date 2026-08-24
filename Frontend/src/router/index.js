@@ -58,7 +58,7 @@ const routes = [
         props: true
     },
     {
-        path: '/payment',
+        path: '/payment/:id',
         name: 'payment-result',
         component: () => import('@/pages/Payment.vue'),
     }

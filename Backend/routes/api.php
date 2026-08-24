@@ -25,6 +25,10 @@ Route::post('/update/booking/status', [BookingController::class, 'getBookingRese
 Route::post('/webhooks/paymongo', [PaymongoWebhookController::class, 'handle']);
 Route::post('/view/venue/slugs', [VenueController::class, 'getVenueBySlug']);
 Route::post('/create/user/newaccount', [UserController::class, 'createNewAccount']);
+
+Route::post('/list/payment/method', [PaymentController::class, 'getPaymentMethod']);
+Route::post('/pay', [PaymentController::class, 'submitPayment']);
+
 Route::get('/testingforbackend', function () {
     $users = User::get();
     return response()->json(['status' => 'success', 'message' => 'Testing successful', 'data' => $users]);
@@ -44,4 +48,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/list/booking', [BookingController::class, 'getMyAccount']);
     Route::get('/admin/review/booking', [BookingController::class, 'getBookingByCode']);
     Route::post('/admin/view/booking', [BookingController::class, 'getBookingByVenueId']);
+
+    Route::post('/create/payment', [PaymentController::class, 'createPayment']);
 });
