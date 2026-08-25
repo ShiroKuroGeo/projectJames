@@ -540,10 +540,40 @@ const toggleSchedule = async (cell) => {
         };
 
         try {
-            const response = await useVenue.setVenueCloseDate(payload);
 
-            const newRecord = response?.data ?? { ...payload, id: response };
-            venueClosedDates.value.push(newRecord);
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to set this venue close date?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, set it!',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await useVenue.setVenueCloseDate(payload);
+
+                    const newRecord = response?.data ?? { ...payload, id: response };
+                    venueClosedDates.value.push(newRecord);
+
+                    await Swal.fire({
+                        title: 'Success!',
+                        text: 'Venue close date has been set.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to set venue close date.',
+                        icon: 'error'
+                    });
+                }
+            }
 
         } catch (error) {
             console.error('Failed to block date:', error);
@@ -654,10 +684,29 @@ const handleSlotClick = async (t) => {
 
     const isCurrentlyBlocked = blockedTimes.value.some(x => normalize(x) === formattedSlot);
 
+    // Dynamic action text based on whether we are blocking or unblocking
+    const action = isCurrentlyBlocked ? 'unblock' : 'block';
+
+    // 1. Show confirmation alert
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you want to ${action} ${t} on ${scheduleDate.value}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: `Yes, ${action} it!`,
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: isCurrentlyBlocked ? '#3085d6' : '#d33'
+    });
+
+    if (!result.isConfirmed) return;
+
+    // 2. Prepare payload
     const next = isCurrentlyBlocked
         ? blockedTimes.value.filter(x => normalize(x) !== formattedSlot)
         : [...blockedTimes.value, t];
 
+    // Optimistic UI update
+    const previousBlockedTimes = [...blockedTimes.value];
     blockedTimes.value = next;
 
     const payload = {
@@ -666,12 +715,51 @@ const handleSlotClick = async (t) => {
         closed_times: next
     };
 
+    // 3. Perform API call
     try {
         await useCourt.setCourtClosedTime(payload);
     } catch (error) {
+        // Revert state and refresh schedule on error
+        blockedTimes.value = previousBlockedTimes;
         await fetchCourtSchedule(activeCourtId.value);
+
+        Swal.fire({
+            title: 'Error!',
+            text: 'Failed to update court closed times.',
+            icon: 'error'
+        });
     }
 };
+
+
+// const handleSlotClick = async (t) => {
+//     if (!t || !activeCourtId.value || !scheduleDate.value) return;
+
+//     const formattedSlot = normalize(t);
+
+//     const isReserved = reservedTimes.value.some(x => normalize(x) === formattedSlot);
+//     if (isReserved) return;
+
+//     const isCurrentlyBlocked = blockedTimes.value.some(x => normalize(x) === formattedSlot);
+
+//     const next = isCurrentlyBlocked
+//         ? blockedTimes.value.filter(x => normalize(x) !== formattedSlot)
+//         : [...blockedTimes.value, t];
+
+//     blockedTimes.value = next;
+
+//     const payload = {
+//         court_id: activeCourtId.value,
+//         closed_date: scheduleDate.value,
+//         closed_times: next
+//     };
+
+//     try {
+//         await useCourt.setCourtClosedTime(payload);
+//     } catch (error) {
+//         await fetchCourtSchedule(activeCourtId.value);
+//     }
+// };
 
 const formatDateLabel = (dateStr) => {
     const [y, m, d] = dateStr.split('-').map(Number);
@@ -1131,10 +1219,6 @@ onMounted(() => {
     background: var(--danger);
 }
 
-/* =========================================================
-   CALENDAR
-   ========================================================= */
-
 .cal-card {
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
@@ -1284,7 +1368,7 @@ onMounted(() => {
 }
 
 .schedule-slot.reserved {
-    background: var(--cream);
+    background-color: rgb(203, 255, 202);
     border-color: var(--line);
     cursor: default;
 }
@@ -1294,7 +1378,7 @@ onMounted(() => {
 }
 
 .schedule-slot.blocked {
-    background: var(--danger-dim);
+    background-color: rgb(255, 169, 169);
     border-color: rgba(196, 60, 41, 0.35);
 }
 
