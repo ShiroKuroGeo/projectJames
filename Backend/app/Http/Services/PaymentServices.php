@@ -59,6 +59,7 @@ class PaymentServices
                 'types' => $paymentType,
                 'image' => $paymentImage,
                 'booking_id' => $booking->id,
+                'ispaid' => $booking->payment_status,
                 'reservations' => $reservation,
                 'status' => 200,
             ], 200);
