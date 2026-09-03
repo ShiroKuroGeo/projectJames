@@ -6,6 +6,7 @@ use App\Models\Payment;
 use App\Models\Booking;
 use App\Models\SubmittedPayment;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class PaymentServices
 {
@@ -46,7 +47,18 @@ class PaymentServices
             $paymentType = Payment::where('user_id', $booking->user_id)->pluck('payment_type');
             $paymentImage = Payment::where('user_id', $booking->user_id)->pluck('image', 'payment_type');
 
-            $downpayment = $booking->hours <= 2 ? ($booking->court->price * .5) : ($booking->court->price * 1);
+            $startHour = Carbon::parse($booking->start_time)->hour;
+
+            if ($startHour >= 6 && $startHour < 17) {
+                $hourlyPrice = 200;
+            } else {
+                $hourlyPrice = $booking->court->price;
+            }
+
+            $totalCost = $hourlyPrice * $booking->hours;
+            $downpayment = $totalCost * 0.5;
+
+            // $downpayment = $booking->hours <= 2 ? ($booking->court->price * .5) : ($booking->court->price * 1);
 
             $reservation = [
                 'label' => $booking->court->name,
