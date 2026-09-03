@@ -50,14 +50,12 @@ class PaymentServices
             $startHour = Carbon::parse($booking->start_time)->hour;
 
             if ($startHour >= 6 && $startHour < 17) {
-                $downpayment = 200;
+                $totalCost = 200 * $booking->hours;
             } else {
                 $totalCost = $booking->court->price * $booking->hours;
-                $downpayment = $totalCost * 0.5;
             }
 
-            // $totalCost = $hourlyPrice * $booking->hours;
-            // $downpayment = $totalCost * 0.5;
+            $downpayment = $totalCost * 0.5;
 
             // $downpayment = $booking->hours <= 2 ? ($booking->court->price * .5) : ($booking->court->price * 1);
 
