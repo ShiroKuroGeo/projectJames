@@ -32,7 +32,7 @@ class UserServices
             $imagePath = null;
 
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('profiles', 'public');
+                $imagePath = $request->file('image')->store('venues_images', 'public');
             }
 
             $newAccount = User::create([
