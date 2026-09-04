@@ -1195,19 +1195,24 @@ function updateTimeLabel() {
 //         `${startTime} – ${endTime}`
 // }
 
-
 const bookingTotal = computed(() => {
+    const price = Number(courtSelected.value?.price || 0);
 
-    const price =
-        Number(courtSelected.value?.price || 0)
+    return selectedSlots.value.reduce((total, slot) => {
+        return total + getSlotPrice(slot, price);
+    }, 0);
+});
 
-    return (
-        getSlotPrice(selectedSlots.value ,price * Number(totalHours.value || 0))
-    )
+// const bookingTotal = computed(() => {
 
-})
+//     const price =
+//         Number(courtSelected.value?.price || 0)
 
-// getSlotPrice
+//     return (
+//         getSlotPrice(selectedSlots.value, price * Number(totalHours.value || 0))
+//     )
+
+// })
 
 function incPlayers() {
     players.value++
@@ -1708,8 +1713,8 @@ function timeToMinutes(timeStr) {
     return hours * 60 + (minutes || 0);
 }
 
-function getSlotPrice(timeStr, defaultPrice) {
-    const slotMinutes = timeToMinutes(timeStr);
+function getSlotPrice(slot, hourlyPrice) {
+    const slotMinutes = timeToMinutes(slot.time);
     const startRange = timeToMinutes('6:00 AM');
     const endRange = timeToMinutes('5:00 PM');
 
@@ -1717,7 +1722,7 @@ function getSlotPrice(timeStr, defaultPrice) {
         return 200;
     }
 
-    return defaultPrice;
+    return hourlyPrice;
 }
 
 onMounted(async () => {
