@@ -292,7 +292,11 @@ const handleBack = () => {
                             <span>₱{{ reservations.amount ?? total }}</span>
                         </div>
                         <div class="side-total">
-                            <span>Total</span>
+                            <span>Total Downpayment: </span>
+                            <span>₱{{ total }}</span>
+                        </div>
+                        <div class="side-total">
+                            <span>Remaining Balance: </span>
                             <span>₱{{ total }}</span>
                         </div>
 
