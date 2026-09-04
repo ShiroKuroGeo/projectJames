@@ -205,7 +205,8 @@ const handleBack = () => {
             <div v-else class="checkout-grid">
                 <section class="checkout-main">
                     <span class="kicker mono">STEP {{ stepIndex + 1 }} OF 3</span>
-                    <h1>{{ step === 'select' ? 'Choose how to pay' : step === 'qr' ? 'Scan & pay' : 'Confirm your payment' }}</h1>
+                    <h1>{{ step === 'select' ? 'Choose how to pay' : step === 'qr' ? 'Scan & pay' : 'Confirm your
+                        payment' }}</h1>
 
                     <div class="score-track">
                         <div class="score-fill"
@@ -296,7 +297,10 @@ const handleBack = () => {
                             <span>₱{{ total }}</span>
                         </div>
                         <div class="side-row">
-                            <span>Remaining Balance: </span>
+                            <span>
+                                Remaining Balance:
+                                <small>TO BE PAID ON COURT</small>
+                            </span>
                             <span>₱{{ total }}</span>
                         </div>
 
