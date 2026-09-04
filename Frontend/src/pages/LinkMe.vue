@@ -1136,8 +1136,6 @@ function updateTimeLabel() {
 }
 
 const bookingTotal = computed(() => {
-    const price = Number(courtSelected.value?.price || 0);
-
     if (selectedSlots.value.length < 2) {
         return 0;
     }
@@ -1156,8 +1154,44 @@ const bookingTotal = computed(() => {
 
     const hours = (endMinutes - startMinutes) / 60;
 
+    const specialStart = convertToMinutes('5:00 AM');
+    const specialEnd = convertToMinutes('6:00 PM');
+
+    if (
+        startMinutes >= specialStart &&
+        endMinutes <= specialEnd
+    ) {
+        return hours * 200;
+    }
+
+    const price = Number(courtSelected.value?.price || 0);
+
     return hours * price;
 });
+
+// const bookingTotal = computed(() => {
+//     const price = Number(courtSelected.value?.price || 0);
+
+//     if (selectedSlots.value.length < 2) {
+//         return 0;
+//     }
+
+//     const sorted = [...selectedSlots.value].sort(
+//         (a, b) =>
+//             convertToMinutes(a.time) -
+//             convertToMinutes(b.time)
+//     );
+
+//     const startMinutes = convertToMinutes(sorted[0].time);
+
+//     const endMinutes = convertToMinutes(
+//         sorted[sorted.length - 1].time
+//     );
+
+//     const hours = (endMinutes - startMinutes) / 60;
+
+//     return hours * price;
+// });
 
 // const bookingTotal = computed(() => {
 //     const price = Number(courtSelected.value?.price || 0);
