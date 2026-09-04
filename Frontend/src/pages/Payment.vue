@@ -298,8 +298,7 @@ const handleBack = () => {
                         </div>
                         <div class="side-row">
                             <span>
-                                Remaining Balance:
-                                <small>TO BE PAID ON COURT</small>
+                                TO BE PAID ON COURT
                             </span>
                             <span>₱{{ total }}</span>
                         </div>
