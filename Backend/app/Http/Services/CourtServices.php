@@ -68,7 +68,8 @@ class CourtServices
                 $query->where('venue_id', $request->integer('venue_id'));
             }
 
-            $courts = $query->get();
+            // $courts = $query->get();
+            $courts = $query->orderBy('created_at', 'asc')->get();
 
             return response()->json([
                 'message' => 'Courts retrieved successfully.',
