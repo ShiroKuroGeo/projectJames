@@ -366,7 +366,7 @@
                                     reserved: s.reserved,
                                     blocked: s.blocked,
                                     selected: selectedSlots.some(selected => selected.time === s.time)
-                                }" :disabled="s.taken" @click=" !s.taken && selectSlot(s)">
+                                }" :disabled="s.taken" @click="!s.taken && selectSlot(s)">
                                     <span class="slot-time">
                                         {{ s.time }}
                                     </span>
@@ -1199,15 +1199,15 @@ function updateTimeLabel() {
 const bookingTotal = computed(() => {
 
     const price =
-        Number(
-            courtSelected.value?.price || 0
-        )
+        Number(courtSelected.value?.price || 0)
 
     return (
-        price *
-        Number(totalHours.value || 0)
+        getSlotPrice(selectedSlots.value ,price * Number(totalHours.value || 0))
     )
+
 })
+
+// getSlotPrice
 
 function incPlayers() {
     players.value++
@@ -1544,7 +1544,7 @@ const confirmBooking = async () => {
         customer_name: `${lastName.value}, ${firstName.value} `,
         customer_phone: phone.value,
         customer_email: email.value,
-        players: players.value, 
+        players: players.value,
         amount: courtSelected.value.price,
         notes: `<div><strong>Players Notes:</strong> ${notes.value || 'None'}<br><strong>Total Hours:</strong> ${bookingTime.hours}<br><strong>Downpayment:</strong> ₱${downpayment >= 350 ? 350 : downpayment}<br><strong>Players:</strong> ${players.value}</div>`
     }
@@ -1693,6 +1693,31 @@ const initLeafletMap = currentVenue => {
             </div>
         `
     ).openPopup()
+}
+
+function timeToMinutes(timeStr) {
+    if (timeStr.includes('AM') || timeStr.includes('PM')) {
+        const [time, modifier] = timeStr.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+        if (modifier === 'PM' && hours < 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
+        return hours * 60 + (minutes || 0);
+    }
+
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + (minutes || 0);
+}
+
+function getSlotPrice(timeStr, defaultPrice) {
+    const slotMinutes = timeToMinutes(timeStr);
+    const startRange = timeToMinutes('6:00 AM');
+    const endRange = timeToMinutes('5:00 PM');
+
+    if (slotMinutes >= startRange && slotMinutes <= endRange) {
+        return 200;
+    }
+
+    return defaultPrice;
 }
 
 onMounted(async () => {
