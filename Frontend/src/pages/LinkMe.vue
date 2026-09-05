@@ -692,7 +692,6 @@ const today = new Date()
 
 today.setHours(0, 0, 0, 0)
 
-
 today.setDate(today.getDate() + 1)
 
 const MAX_DAYS_AHEAD = 21
@@ -1155,7 +1154,7 @@ const bookingTotal = computed(() => {
     const hours = (endMinutes - startMinutes) / 60;
 
     const specialStart = convertToMinutes('5:00 AM');
-    const specialEnd = convertToMinutes('6:00 PM');
+    const specialEnd = convertToMinutes('4:00 PM');
 
     if (
         startMinutes >= specialStart &&
