@@ -49,7 +49,7 @@ class PaymentServices
 
             $startHour = Carbon::parse($booking->start_time)->hour;
 
-            if ($startHour >= 6 && $startHour < 17) {
+            if ($startHour >= 6 && $startHour < 16) {
                 $totalCost = 200 * $booking->hours;
             } else {
                 $totalCost = $booking->court->price * $booking->hours;
