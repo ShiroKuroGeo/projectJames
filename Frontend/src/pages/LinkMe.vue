@@ -1707,12 +1707,12 @@ const confirmBooking = async () => {
 
     await useBooking.createBooking(formData)
 
-    // router.push({
-    //     name: 'payment-result',
-    //     params: {
-    //         id: bookingCode
-    //     }
-    // })
+    router.push({
+        name: 'payment-result',
+        params: {
+            id: bookingCode
+        }
+    })
 
 
     // const result = await usePayment.submitPayment(amount * 100, bookingCode);
