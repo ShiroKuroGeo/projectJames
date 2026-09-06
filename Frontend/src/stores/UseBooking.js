@@ -50,7 +50,6 @@ export const useBookingStore = defineStore('BookingStore', () => {
     const getReservation = async (data) => {
         try {
             const response = await api.post('view/booking', data);
-
             return response.data.data;
         } catch (error) {
             if(error.response) {

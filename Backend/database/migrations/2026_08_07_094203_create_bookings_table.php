@@ -20,9 +20,13 @@ return new class extends Migration
             $table->string('customer_name');
             $table->string('customer_phone');
             $table->string('customer_email')->nullable();
+            // $table->date('booking_date');
+            // $table->string('start_time');
+            // $table->string('end_time');
             $table->date('booking_date');
-            $table->string('start_time');
-            $table->string('end_time');
+            $table->dateTime('start_datetime');
+            $table->dateTime('end_datetime');
+            
             $table->string('hours');
             $table->integer('amount');
             $table->enum('payment_method', ['gcash', 'maya']);

@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('booking_slots', function (Blueprint $table) {
             $table->id();
             $table->foreignId('booking_id')->constrained()->cascadeOnDelete();
-            $table->date('slot_date');
-            $table->string('start_time');
-            $table->string('end_time');
+            $table->dateTime('start_datetime');
+            $table->dateTime('end_datetime');
+            // $table->date('slot_date');
+            // $table->string('start_time');
+            // $table->string('end_time');
             $table->timestamps();
         });
     }

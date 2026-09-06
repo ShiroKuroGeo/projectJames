@@ -15,14 +15,19 @@ class Booking extends Model
         'customer_phone',
         'customer_email',
         'booking_date',
-        'start_time',
-        'end_time',
+        'start_datetime',
+        'end_datetime',
         'hours',
         'amount',
         'payment_method',
         'payment_status',
         'status',
         'notes',
+    ];
+
+    protected $casts = [
+        'start_datetime' => 'datetime',
+        'end_datetime'   => 'datetime',
     ];
 
     public function user()

@@ -42,22 +42,33 @@ class PaymentServices
     public function attemptGetPaymentMethod(Request $request)
     {
         try {
-            $booking = Booking::with(['court'])->where('booking_code', $request->bookingCode)->first();
+            $request->validate([
+                'bookingCode' => ['required', 'string'],
+            ]);
+
+            $booking = Booking::with(['court'])
+                ->where('booking_code', $request->bookingCode)
+                ->first();
+
+            if (!$booking) {
+                return response()->json([
+                    'message' => 'Booking not found.',
+                    'data' => [],
+                    'status' => 404,
+                ], 404);
+            }
+
             $paymentMethods = Payment::with('user')->where('user_id', $booking->user_id)->get();
             $paymentType = Payment::where('user_id', $booking->user_id)->pluck('payment_type');
             $paymentImage = Payment::where('user_id', $booking->user_id)->pluck('image', 'payment_type');
 
-            $startHour = Carbon::parse($booking->start_time)->hour;
+            $startHour = Carbon::parse($booking->start_datetime)->hour;
 
-            if ($startHour >= 6 && $startHour < 16) {
-                $totalCost = 200 * $booking->hours;
-            } else {
-                $totalCost = $booking->court->price * $booking->hours;
-            }
+            $totalCost = ($startHour >= 6 && $startHour < 16)
+                ? 200 * $booking->hours
+                : $booking->court->price * $booking->hours;
 
             $downpayment = $totalCost * 0.5;
-
-            // $downpayment = $booking->hours <= 2 ? ($booking->court->price * .5) : ($booking->court->price * 1);
 
             $reservation = [
                 'label' => $booking->court->name,
@@ -76,14 +87,57 @@ class PaymentServices
             ], 200);
         } catch (\Throwable $th) {
             report($th);
-
             return response()->json([
-                'message' => $th->getMessage(),
+                'message' => 'Something is wrong. Please try again.',
                 'data' => [],
                 'status' => 500,
             ], 500);
         }
     }
+
+    // public function attemptGetPaymentMethod(Request $request)
+    // {
+    //     try {
+    //         $booking = Booking::with(['court'])->where('booking_code', $request->bookingCode)->first();
+    //         $paymentMethods = Payment::with('user')->where('user_id', $booking->user_id)->get();
+    //         $paymentType = Payment::where('user_id', $booking->user_id)->pluck('payment_type');
+    //         $paymentImage = Payment::where('user_id', $booking->user_id)->pluck('image', 'payment_type');
+
+    //         $startHour = Carbon::parse($booking->start_time)->hour;
+
+    //         if ($startHour >= 6 && $startHour < 16) {
+    //             $totalCost = 200 * $booking->hours;
+    //         } else {
+    //             $totalCost = $booking->court->price * $booking->hours;
+    //         }
+
+    //         $downpayment = $totalCost * 0.5;
+
+    //         $reservation = [
+    //             'label' => $booking->court->name,
+    //             'amount' => $downpayment,
+    //         ];
+
+    //         return response()->json([
+    //             'message' => 'Get list of payment Methods.',
+    //             'data' => $paymentMethods,
+    //             'types' => $paymentType,
+    //             'image' => $paymentImage,
+    //             'booking_id' => $booking->id,
+    //             'ispaid' => $booking->payment_status,
+    //             'reservations' => $reservation,
+    //             'status' => 200,
+    //         ], 200);
+    //     } catch (\Throwable $th) {
+    //         report($th);
+
+    //         return response()->json([
+    //             'message' => $th->getMessage(),
+    //             'data' => [],
+    //             'status' => 500,
+    //         ], 500);
+    //     }
+    // }
 
     public function attemptSubmitPayment(Request $request)
     {
