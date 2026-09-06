@@ -46,6 +46,17 @@ const canSubmit = computed(() =>
     !!file.value && agreeNoRefund.value && agreeTerms.value && !submitting.value
 )
 
+const formatRelativeTime = (isoString) => {
+    return new Date(isoString).toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+}
+
 const ctaLabel = computed(() => {
     if (step.value === 'select') return 'Continue'
     if (step.value === 'qr') return "I've paid — Continue"
@@ -300,6 +311,48 @@ const handleBack = () => {
                                 TO BE PAID ON COURT
                             </span>
                             <span>₱{{ total }}</span>
+                        </div>
+                        <hr style="border: 1px dashed;">
+                        <h4>Reservation Details</h4>
+
+                        <div class="side-row">
+                            <span>
+                                Time Start
+                            </span>
+                            <span>{{ formatRelativeTime(reservations.start_time) }}</span>
+                        </div>
+                        <div class="side-row">
+                            <span>
+                                Time End
+                            </span>
+                            <span>{{ formatRelativeTime(reservations.end_time) }}</span>
+                        </div>
+                        <div class="side-row">
+                            <span>
+                                Venues
+                            </span>
+                            <div>
+                                <div style="text-align: end;">{{ reservations.venues }}</div>
+                                <small>{{ reservations.location }}</small>
+                            </div>
+                        </div>
+                        <div class="side-row">
+                            <span>
+                                Court
+                            </span>
+                            <span>{{ reservations.court }}</span>
+                        </div>
+                        <div class="side-row">
+                            <span>
+                                Customer Name
+                            </span>
+                            <span>{{ reservations.customer_name }}</span>
+                        </div>
+                        <div class="side-row">
+                            <span>
+                                Total Hours
+                            </span>
+                            <span>{{ reservations.hours }}</span>
                         </div>
 
                         <button class="btn btn-lime full" :disabled="ctaDisabled" @click="handleCta">
