@@ -46,7 +46,7 @@ class PaymentServices
                 'bookingCode' => ['required', 'string'],
             ]);
 
-            $booking = Booking::with(['court'])
+            $booking = Booking::with(['court', 'venue'])
                 ->where('booking_code', $request->bookingCode)
                 ->first();
 
@@ -73,6 +73,13 @@ class PaymentServices
             $reservation = [
                 'label' => $booking->court->name,
                 'amount' => $downpayment,
+                'start_time' => $booking->start_datetime,
+                'end_time' => $booking->end_datetime,
+                'court' => $booking->court->name,
+                'venues' => $booking->venue->name,
+                'location' => $booking->venue->area,
+                'hours' => $booking->hours,
+                'customer_name' => $booking->customer_name,
             ];
 
             return response()->json([
