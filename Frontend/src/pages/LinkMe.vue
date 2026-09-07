@@ -1291,7 +1291,7 @@ const bookingTotal = computed(() => {
     const endIdx = effectiveIndex(sorted[sorted.length - 1].time, sorted[sorted.length - 1].dayOffset)
 
     const specialStartIdx = timeIndex('5:00 AM')
-    const specialEndIdx = timeIndex('4:00 PM')
+    const specialEndIdx = timeIndex('5:00 PM')
 
     const price = Number(courtSelected.value?.price || 0)
 
