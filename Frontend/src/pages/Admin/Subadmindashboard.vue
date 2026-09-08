@@ -25,7 +25,8 @@
                         </div>
                         <div class="court-tabs">
                             {{ currentVenueId }}
-                            <button v-for="c in managedVenues" :key="c.id" class="court-tab" :class="{ active: currentVenueId === c.id }" @click="changeVenue(c.id)">
+                            <button v-for="c in managedVenues" :key="c.id" class="court-tab"
+                                :class="{ active: currentVenueId === c.id }" @click="changeVenue(c.id)">
                                 {{ c.name }}
                             </button>
                         </div>
@@ -84,7 +85,8 @@
                     </div>
 
                     <div class="court-tabs">
-                        <button v-for="c in managedVenues" :key="c.id" class="court-tab" :class="{ active: currentVenueId === c.id }" @click="changeVenue(c.id)">
+                        <button v-for="c in managedVenues" :key="c.id" class="court-tab"
+                            :class="{ active: currentVenueId === c.id }" @click="changeVenue(c.id)">
                             {{ c.name }}
                         </button>
                     </div>
@@ -116,7 +118,8 @@
                             }}</span>
                         </div>
                         <div class="cal-grid">
-                            <div v-for="(cell, i) in calendarCells" :key="i" class="cal-day" :class="cellClass(cell)" @click="cell && !cell.disabled && toggleSchedule(cell)">
+                            <div v-for="(cell, i) in calendarCells" :key="i" class="cal-day" :class="cellClass(cell)"
+                                @click="cell && !cell.disabled && toggleSchedule(cell)">
                                 {{ cell ? cell.day : '' }}
                             </div>
                         </div>
@@ -130,11 +133,13 @@
                                 <span class="card-tag mono">Today's schedule</span>
                                 <h2 class="card-title small">{{ scheduleDateLabel }}</h2>
                             </div>
-                            <input type="date" class="date-input mono" :min="todayKey" :max="maxKey" v-model="scheduleDate" @change="fetchCourtSchedule(activeCourtId)">
+                            <input type="date" class="date-input mono" :min="todayKey" :max="maxKey"
+                                v-model="scheduleDate" @change="fetchCourtSchedule(activeCourtId)">
                         </div>
 
                         <div class="court-tabs">
-                            <button v-for="c in COURT_NAMES" :key="c.id" class="court-tab" :class="{ active: activeCourtId === c.id }" @click="selectedCourt(c.id)">
+                            <button v-for="c in COURT_NAMES" :key="c.id" class="court-tab"
+                                :class="{ active: activeCourtId === c.id }" @click="selectedCourt(c.id)">
                                 {{ c.name }}
                             </button>
                         </div>
@@ -142,11 +147,13 @@
                         <div class="legend">
                             <span class="legend-item"><i class="dot open"></i> Open</span>
                             <span class="legend-item"><i class="dot reserved"></i> Reserved</span>
-                            <span class="legend-item"><i class="dot blocked"></i> Blocked — tap Open to block/unblock</span>
+                            <span class="legend-item"><i class="dot blocked"></i> Blocked — tap Open to
+                                block/unblock</span>
                         </div>
 
                         <div class="schedule-grid">
-                            <div v-for="t in TIMES" :key="t" class="schedule-slot" :class="slotStatus(t)" @click="handleSlotClick(t)">
+                            <div v-for="t in TIMES" :key="t" class="schedule-slot" :class="slotStatus(t)"
+                                @click="handleSlotClick(t)">
                                 <span class="slot-time mono">{{ t }}</span>
                                 <span class="slot-state mono">{{ slotStatusLabel(t) }}</span>
                             </div>
@@ -158,7 +165,8 @@
                         </div>
 
                         <div class="court-tabs">
-                            <button v-for="c in COURT_NAMES" :key="c.id" class="court-tab" :class="{ active: activeCourtId === c.id }" @click="selectedCourt(c.id)">
+                            <button v-for="c in COURT_NAMES" :key="c.id" class="court-tab"
+                                :class="{ active: activeCourtId === c.id }" @click="selectedCourt(c.id)">
                                 {{ c.name }}
                             </button>
                         </div>
@@ -168,7 +176,8 @@
 
                 <div class="admin-card" v-show="tab === 'booking'">
                     <div class="filter-bar">
-                        <input v-model="search" type="text" class="search-input" placeholder="Search name, phone, or code…">
+                        <input v-model="search" type="text" class="search-input"
+                            placeholder="Search name, phone, or code…">
                         <select v-model="venueFilter" class="filter-select">
                             <option value="">All venues</option>
                             <option v-for="v in VENUES" :key="v.id" :value="v.id">{{ v.name }}</option>
@@ -181,7 +190,8 @@
                         </select>
                     </div>
 
-                    <div class="booking-count mono">{{ filteredBookings.length }} booking{{ filteredBookings.length === 1 ? '' : 's' }}</div>
+                    <div class="booking-count mono">{{ filteredBookings.length }} booking{{ filteredBookings.length ===
+                        1 ? '' : 's' }}</div>
 
                     <div class="booking-list">
                         <div v-if="filteredBookings.length === 0" class="empty-state">No bookings match those filters.
@@ -191,7 +201,8 @@
                             <div class="status-rail" :class="b.status"></div>
 
                             <div class="booking-row-body">
-                                <div class="booking-row-main" :class="{ open: expandedCode === b.code }" @click="toggleExpand(b.code)">
+                                <div class="booking-row-main" :class="{ open: expandedCode === b.code }"
+                                    @click="toggleExpand(b.code)">
                                     <div class="booking-row-left">
                                         <div class="booking-code mono">{{ b.code }}</div>
                                         <div class="booking-name">{{ b.customerName }}</div>
@@ -216,7 +227,8 @@
                                         </div>
                                         <div class="fact">
                                             <span class="fact-label mono">Down Payment Status</span>
-                                            <span class="fact-value" style="text-transform: capitalize;">{{ b.paymentStatus }}</span>
+                                            <span class="fact-value" style="text-transform: capitalize;">{{
+                                                b.paymentStatus }}</span>
                                         </div>
                                         <div class="fact">
                                             <span class="fact-label mono">Status</span>
@@ -229,33 +241,34 @@
                                         <p class="note-text" v-html="b.notes"></p>
                                     </div>
 
-
                                     <div class="expand-note payment-proof" v-if="b.raw?.submitted_payment?.image">
-                                        <img :src="image(b.raw.submitted_payment.image)" alt="Payment proof" class="payment-proof-image" @click="openPaymentModal(b.raw.submitted_payment.image)">
+                                        <img :src="image(b.raw.submitted_payment.image)" alt="Payment proof"
+                                            class="payment-proof-image"
+                                            @click="openPaymentModal(b.raw.submitted_payment.image)">
                                     </div>
 
                                     <div v-if="showPaymentModal" class="payment-modal" @click.self="closePaymentModal">
                                         <div class="payment-modal-content">
-                                            <button class="payment-modal-close" type="button" @click="closePaymentModal">
+                                            <button class="payment-modal-close" type="button"
+                                                @click="closePaymentModal">
                                                 ×
                                             </button>
 
-                                            <img v-if="selectedPaymentImage" :src="image(selectedPaymentImage)" alt="Payment proof" class="payment-modal-image">
+                                            <img v-if="selectedPaymentImage" :src="image(selectedPaymentImage)"
+                                                alt="Payment proof" class="payment-modal-image">
                                         </div>
                                     </div>
-
-                                    <!-- <div class="expand-note">
-                                        <img :src="image(b.submitted_payment.image)" alt="">
-                                    </div> -->
-
                                     <div class="expand-actions">
-                                        <button v-if="b.paymentStatus === 'downpayment'" class="action-btn primary" @click="markFullyPaid(b)">
+                                        <button v-if="b.paymentStatus === 'downpayment'" class="action-btn primary"
+                                            @click="markFullyPaid(b)">
                                             Mark fully paid
                                         </button>
-                                        <button v-if="b.status === 'confirmed'" class="action-btn success" @click="completeBooking(b)">
+                                        <button v-if="b.status === 'confirmed'" class="action-btn success"
+                                            @click="completeBooking(b)">
                                             Mark complete
                                         </button>
-                                        <button v-if="b.status === 'pending' || b.paymentStatus === 'pending'" class="action-btn ghost-danger" @click="cancelBooking(b)">
+                                        <button v-if="b.status === 'pending' || b.paymentStatus === 'pending'"
+                                            class="action-btn ghost-danger" @click="cancelBooking(b)">
                                             Cancel booking
                                         </button>
                                     </div>
@@ -776,7 +789,7 @@ const mapBooking = (b) => ({
     venueName: b.venue?.name ?? '—',
     courtName: b.court?.name ?? '—',
     dateLabel: formatDateLabel(b.booking_date),
-    timeLabel: `${b.start_time} - ${b.end_time} (${b.hours} hrs)`,
+    timeLabel: `${formatDatetime(b.start_datetime)} - ${formatDatetime(b.end_datetime)} (${b.hours} hrs)`,
     amount: Number(b.amount),
     status: b.status,
     paymentStatus: b.payment_status,
@@ -786,6 +799,20 @@ const mapBooking = (b) => ({
     players: extractPlayers(b.notes),
     raw: b,
 });
+
+function formatDatetime(isoString) {
+    const date = new Date(isoString)
+
+    const month = date.toLocaleDateString('en-US', { month: 'short' }) // 'Sep'
+    const day = String(date.getDate()).padStart(2, '0')                 // '06'
+    const year = date.getFullYear()                                     // 2026
+
+    let hours = date.getHours()
+    const meridiem = hours >= 12 ? 'PM' : 'AM'
+    hours = hours % 12 || 12 // convert 0/13-23 to 12-hour format
+
+    return `${month} ${day}, ${year} ${hours}${meridiem}`
+}
 
 const extractPlayers = (notes) => {
     const match = notes?.match(/total player of (\d+)/i);
