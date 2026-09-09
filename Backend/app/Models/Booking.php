@@ -25,11 +25,6 @@ class Booking extends Model
         'notes',
     ];
 
-    protected $casts = [
-        'start_datetime' => 'datetime',
-        'end_datetime'   => 'datetime',
-    ];
-
     public function user()
     {
         return $this->belongsTo(User::class);
