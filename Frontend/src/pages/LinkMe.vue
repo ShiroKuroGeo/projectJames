@@ -659,6 +659,7 @@ import Logo from '@/component/assets/logo.jpg'
 import { image } from '@/utils/image'
 import { useBookingStore } from '@/stores/UseBooking'
 import { usePaymentStore } from '@/stores/UsePayment'
+import Swal from 'sweetalert2'
 
 const useCourt = useCourtStore()
 const useVenue = useVenueStore()
@@ -1705,25 +1706,22 @@ const confirmBooking = async () => {
         notes: `<div><strong>Players Notes:</strong> ${notes.value || 'None'}<br><strong>Total Hours:</strong> ${bookingTime.hours}<br><strong>Downpayment:</strong> ₱${downpayment >= 350 ? 350 : downpayment}<br><strong>Players:</strong> ${players.value}</div>`
     }
 
-    await useBooking.createBooking(formData)
+    const response = await useBooking.createBooking(formData)
 
-    router.push({
-        name: 'payment-result',
-        params: {
-            id: bookingCode
-        }
-    })
-
-
-    // const result = await usePayment.submitPayment(amount * 100, bookingCode);
-
-    // if (result?.data?.checkout_url) {
-    //     window.location.href = result.data.checkout_url;
-    //     confirmed.value = true
-    // } else {
-    //     console.error("Checkout URL missing from response:", result);
-    // }
-
+    if (response.status === 201) {
+        router.push({
+            name: 'payment-result',
+            params: {
+                id: bookingCode
+            }
+        });
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error occured.',
+            text: `Reservation is not submitted due to conflict of current reservation. Please check again.`,  
+        });
+    }
 }
 
 function isSlotDisabled(slot) {

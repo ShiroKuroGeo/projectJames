@@ -6,7 +6,8 @@ export const useBookingStore = defineStore('BookingStore', () => {
     const createBooking = async (data) => {
         try {
             const response = await api.post('create/booking', data);
-            return response.data.message;
+            
+            return response.data;
         } catch (err) {
             if (err.response) {
                 return err.response.data.message || 'Something went wrong.';
