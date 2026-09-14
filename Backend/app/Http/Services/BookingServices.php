@@ -53,10 +53,10 @@ class BookingServices
             $booking = DB::transaction(function () use ($validated, $startDatetime, $endDatetime) {
 
                 $conflict = Booking::where('court_id', $validated['court_id'])
-                    ->whereIn('status', ['pending', 'confirmed'])
+                    ->where('status', 'confirmed')
                     ->where('start_datetime', '<', $endDatetime)
                     ->where('end_datetime', '>', $startDatetime)
-                    ->lockForUpdate()
+                    // ->lockForUpdate()
                     ->exists();
 
                 if ($conflict) {
