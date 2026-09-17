@@ -582,18 +582,18 @@ class BookingServices
         return $times;
     }
 
-    private function expandDatetimeRange(Carbon $start, Carbon $end, Carbon $dayStart, Carbon $dayEnd): array
-    {
-        $cursor = $start->copy()->max($dayStart);
-        $clampedEnd = $end->copy()->min($dayEnd->copy()->addSecond());
+    // private function expandDatetimeRange(Carbon $start, Carbon $end, Carbon $dayStart, Carbon $dayEnd): array
+    // {
+    //     $cursor = $start->copy()->max($dayStart);
+    //     $clampedEnd = $end->copy()->min($dayEnd->copy()->addSecond());
 
-        $slots = [];
-        while ($cursor->lt($clampedEnd)) {
-            $slots[] = $cursor->format('g:i A');
-            $cursor->addHour();
-        }
-        return $slots;
-    }
+    //     $slots = [];
+    //     while ($cursor->lt($clampedEnd)) {
+    //         $slots[] = $cursor->format('g:i A');
+    //         $cursor->addHour();
+    //     }
+    //     return $slots;
+    // }
 
     // private function expandDatetimeRange(Carbon $start, Carbon $end): array
     // {
