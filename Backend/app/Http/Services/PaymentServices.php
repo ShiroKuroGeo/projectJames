@@ -164,7 +164,6 @@ class PaymentServices
 
             Booking::where('booking_code', $request->booking_code)->update([
                 'payment_status' => 'paid',
-                'status' => 'confirmed'
             ]);
 
             return response()->json([
