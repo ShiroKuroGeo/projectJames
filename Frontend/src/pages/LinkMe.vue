@@ -695,7 +695,7 @@ const today = new Date()
 const HOURS_PER_DAY = TIMES.length
 today.setHours(0, 0, 0, 0)
 
-today.setDate(today.getDate() + 1)
+today.setDate(today.getDate())
 
 const MAX_DAYS_AHEAD = 21
 
