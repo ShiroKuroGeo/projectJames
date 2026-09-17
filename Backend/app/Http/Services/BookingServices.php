@@ -489,7 +489,7 @@ class BookingServices
 
             $bookings = Booking::where('venue_id', $request->venue_id)
                 ->where('court_id', $request->court_id)
-                ->where('status', 'completed')
+                ->whereNot('status', 'pending')
                 ->where('payment_status', 'paid')
                 ->where('start_datetime', '<', $dayEnd)
                 ->where('end_datetime', '>', $dayStart)
