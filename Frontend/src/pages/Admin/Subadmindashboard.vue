@@ -204,7 +204,8 @@
                                 <div class="booking-row-main" :class="{ open: expandedCode === b.code }"
                                     @click="toggleExpand(b.code)">
                                     <div class="booking-row-left">
-                                        <div class="booking-code mono">{{ b.code }}</div>
+                                        <div class="booking-code mono">{{ b.code }}
+                                        <span class="status-badge-payment" :class="b.paymentStatus">{{ b.paymentStatus }}</span></div>
                                         <div class="booking-name">{{ b.customerName }}</div>
                                         <div class="booking-meta mono">{{ b.venueName }} · {{ b.courtName }}</div>
                                     </div>
@@ -270,6 +271,10 @@
                                         <button v-if="b.status === 'pending' || b.paymentStatus === 'pending'"
                                             class="action-btn ghost-danger" @click="cancelBooking(b)">
                                             Cancel booking
+                                        </button>
+                                        <button v-if="b.status === 'pending' && b.paymentStatus === 'paid'"
+                                            class="action-btn success" @click="confirmBooking(b)">
+                                            Confirm Booking
                                         </button>
                                     </div>
                                 </div>
@@ -373,6 +378,28 @@ const markFullyPaid = async (b) => {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes confirmed!',
+        cancelButtonText: 'Cancel'
+    });
+
+    if (result.isConfirmed) {
+        const target = allBookings.value.find(x => x.code === b.code);
+        const response = await useBooking.changeBookingStatus({
+            id: target.raw.id,
+            status: 'confirmed',
+        });
+        if (response) target.status = 'confirmed';
+    };
+};
+
+const confirmBooking = async (b) => {
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, confirmed it!',
         cancelButtonText: 'Cancel'
     });
 
@@ -1624,13 +1651,13 @@ onMounted(() => {
     transform: rotate(180deg);
 }
 
-.status-badge,
+.status-badge-payment,
 .payment-pill {
     display: inline-flex;
     width: fit-content;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 9px;
+    font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.03em;
     padding: 3px 9px;
@@ -1639,6 +1666,12 @@ onMounted(() => {
 
 .status-badge.confirmed,
 .payment-pill.confirmed {
+    background: rgba(196, 221, 65, 0.16);
+    color: var(--lime-2);
+}
+
+.status-badge-payment.paid,
+.payment-pill.paid {
     background: rgba(196, 221, 65, 0.16);
     color: var(--lime-2);
 }

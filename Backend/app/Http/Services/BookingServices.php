@@ -537,16 +537,16 @@ class BookingServices
 
             $bookings = Booking::where('venue_id', $request->venue_id)
                 ->where('court_id', $request->court_id)
-                ->where('status', 'paid')
-                ->whereIn('payment_status', ['completed', 'confirmed'])
+                ->where('payment_status', 'paid')
+                ->whereIn('status', ['completed', 'confirmed'])
                 ->where('start_datetime', '<', $dayEnd)
                 ->where('end_datetime', '>', $dayStart)
                 ->get(['start_datetime', 'end_datetime']);
 
             $reservedTimes = $bookings
                 ->flatMap(function ($b) use ($dayStart, $dayEnd) {
-                    $start = $b->start_datetime->max($dayStart);
-                    $end   = $b->end_datetime->min($dayEnd);
+                    $start = Carbon::parse($b->start_datetime)->max($dayStart);
+                    $end   = Carbon::parse($b->end_datetime)->min($dayEnd);
 
                     return $this->expandDatetimeRange($start, $end);
                 })
@@ -556,7 +556,7 @@ class BookingServices
 
             return response()->json([
                 'message' => 'Successfully retrieved reservation time booking by Venues Id.',
-                'data' => $bookings,
+                'data' => $reservedTimes,
                 'status' => 200,
             ], 200);
         } catch (\Throwable $th) {
