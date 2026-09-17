@@ -556,7 +556,7 @@ class BookingServices
 
             return response()->json([
                 'message' => 'Successfully retrieved reservation time booking by Venues Id.',
-                'data' => $reservedTimes,
+                'data' => $bookings,
                 'status' => 200,
             ], 200);
         } catch (\Throwable $th) {
