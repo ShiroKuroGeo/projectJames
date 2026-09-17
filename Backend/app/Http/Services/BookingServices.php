@@ -489,8 +489,8 @@ class BookingServices
 
             $bookings = Booking::where('venue_id', $request->venue_id)
                 ->where('court_id', $request->court_id)
-                ->where('status', 'paid')
-                ->where('payment_status', 'completed')
+                ->where('status', 'completed')
+                ->where('payment_status', 'paid')
                 ->where('start_datetime', '<', $dayEnd)
                 ->where('end_datetime', '>', $dayStart)
                 ->get(['start_datetime', 'end_datetime']);
