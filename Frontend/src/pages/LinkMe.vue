@@ -659,20 +659,13 @@ const notes = ref('')
 const today = new Date()
 const HOURS_PER_DAY = TIMES.length
 today.setHours(0, 0, 0, 0)
-
 today.setDate(today.getDate())
-
 const MAX_DAYS_AHEAD = 21
-
 const maxDate = new Date(today)
 
-maxDate.setDate(
-    maxDate.getDate() + MAX_DAYS_AHEAD
-)
+maxDate.setDate(maxDate.getDate() + MAX_DAYS_AHEAD)
 
-const viewYear = ref(
-    today.getFullYear()
-)
+const viewYear = ref(today.getFullYear())
 
 const viewTags = (tag) => {
     return tag?.join(', ') ?? ''
@@ -697,7 +690,6 @@ const monthLabel = computed(() => {
         }
     )
 })
-
 
 function pad(number) {
     return String(number).padStart(2, '0')

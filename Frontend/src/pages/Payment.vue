@@ -160,9 +160,10 @@ const submitPayment = async () => {
             if (result.isConfirmed) {
                 ispaid.value = true;
             }
-            // setTimeout(() => {
-            //     router.push({ name: 'checkreservation' })
-            // }, 2000)
+
+            setTimeout(() => {
+                router.push({ name: 'checkreservation' })
+            }, 2000)
         }
 
     } catch (err) {
@@ -191,7 +192,7 @@ const handleBack = () => {
             <button class="topbar-back" @click="handleBack" aria-label="Back">
                 <span>←</span>
             </button>
-            <div class="topbar-brand">
+            <div class="topbar-brand" @click="router.push({ name: 'homepage' })">
                 <img :src="logo" class="topbar-logo" alt="" />
                 <span>Court-<span class="accent">tesy</span></span>
             </div>
