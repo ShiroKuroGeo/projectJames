@@ -10,11 +10,9 @@ use Carbon\Carbon;
 
 class PaymentServices
 {
-
     public function attemptCreatePayment(Request $request)
     {
         try {
-
             $validation = $request->validate([
                 'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
                 'user_id' => ['required', 'integer', 'exists:users,id'],
@@ -22,7 +20,7 @@ class PaymentServices
             ]);
 
             $payment = Payment::create($validation);
-
+            
             return response()->json([
                 'message' => 'Payment method created successfully.',
                 'data' => $payment,
@@ -101,50 +99,6 @@ class PaymentServices
             ], 500);
         }
     }
-
-    // public function attemptGetPaymentMethod(Request $request)
-    // {
-    //     try {
-    //         $booking = Booking::with(['court'])->where('booking_code', $request->bookingCode)->first();
-    //         $paymentMethods = Payment::with('user')->where('user_id', $booking->user_id)->get();
-    //         $paymentType = Payment::where('user_id', $booking->user_id)->pluck('payment_type');
-    //         $paymentImage = Payment::where('user_id', $booking->user_id)->pluck('image', 'payment_type');
-
-    //         $startHour = Carbon::parse($booking->start_time)->hour;
-
-    //         if ($startHour >= 6 && $startHour < 16) {
-    //             $totalCost = 200 * $booking->hours;
-    //         } else {
-    //             $totalCost = $booking->court->price * $booking->hours;
-    //         }
-
-    //         $downpayment = $totalCost * 0.5;
-
-    //         $reservation = [
-    //             'label' => $booking->court->name,
-    //             'amount' => $downpayment,
-    //         ];
-
-    //         return response()->json([
-    //             'message' => 'Get list of payment Methods.',
-    //             'data' => $paymentMethods,
-    //             'types' => $paymentType,
-    //             'image' => $paymentImage,
-    //             'booking_id' => $booking->id,
-    //             'ispaid' => $booking->payment_status,
-    //             'reservations' => $reservation,
-    //             'status' => 200,
-    //         ], 200);
-    //     } catch (\Throwable $th) {
-    //         report($th);
-
-    //         return response()->json([
-    //             'message' => $th->getMessage(),
-    //             'data' => [],
-    //             'status' => 500,
-    //         ], 500);
-    //     }
-    // }
 
     public function attemptSubmitPayment(Request $request)
     {

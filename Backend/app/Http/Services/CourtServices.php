@@ -5,6 +5,7 @@ namespace App\Http\Services;
 use App\Models\Court;
 use Illuminate\Http\Request;
 use App\Models\CourtCloseTime;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -172,36 +173,37 @@ class CourtServices
 
     public function attemptCourtCloseTime(Request $request)
     {
+        $validated = $request->validate([
+            'court_id' => ['nullable', 'integer', 'exists:courts,id'],
+            'schedule' => ['nullable', 'date'],
+        ]);
+
         try {
             $query = CourtCloseTime::query();
 
-            $request->validate([
-                'court_id' => ['nullable', 'integer', 'exists:courts,id'],
-                'schedule' => ['nullable', 'date'],
-            ]);
-
             if ($request->filled('court_id')) {
-                $query->where('court_id', $request->integer('court_id'));
+                $query->where('court_id', $validated['court_id']);
             }
 
             if ($request->filled('schedule')) {
-                $query->whereDate('closed_date', $request->input('schedule'));
+                $formattedDate = Carbon::parse($validated['schedule'])->format('Y-m-d');
+                $query->whereDate('closed_date', $formattedDate);
             }
 
-            $courts = $query->first();
+            $courtCloseTime = $query->first();
 
             return response()->json([
-                'message' => 'Courts time close retrieved successfully.',
-                'data' => $courts,
+                'message' => 'Court close time retrieved successfully.',
+                'data' => $validated,
                 'status' => 200,
-            ]);
+            ], 200);
         } catch (\Throwable $th) {
             report($th);
 
             return response()->json([
-                'message' => 'Something is wrong. Please try again.',
-                'data' => [],
-                'status' => 500,
+                'message' => 'Something went wrong. Please try again.',
+                'error'   => config('app.debug') ? $th->getMessage() : null,
+                'status'  => 500,
             ], 500);
         }
     }

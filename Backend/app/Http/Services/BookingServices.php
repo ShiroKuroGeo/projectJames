@@ -117,173 +117,6 @@ class BookingServices
         }
     }
 
-    // public function attemptCreateBooking(Request $request)
-    // {
-    //     try {
-    //         $times = [
-    //             '12:00 AM',
-    //             '1:00 AM',
-    //             '2:00 AM',
-    //             '3:00 AM',
-    //             '4:00 AM',
-    //             '5:00 AM',
-    //             '6:00 AM',
-    //             '7:00 AM',
-    //             '8:00 AM',
-    //             '9:00 AM',
-    //             '10:00 AM',
-    //             '11:00 AM',
-    //             '12:00 PM',
-    //             '1:00 PM',
-    //             '2:00 PM',
-    //             '3:00 PM',
-    //             '4:00 PM',
-    //             '5:00 PM',
-    //             '6:00 PM',
-    //             '7:00 PM',
-    //             '8:00 PM',
-    //             '9:00 PM',
-    //             '10:00 PM',
-    //             '11:00 PM',
-    //         ];
-
-    //         $validated = $request->validate([
-    //             'booking_code'    => ['required', 'string', 'max:100', 'unique:bookings,booking_code'],
-    //             'venue_id'        => ['required', 'integer', 'exists:venues,id'],
-    //             'court_id'        => ['required', 'integer', 'exists:courts,id'],
-    //             'customer_name'   => ['required', 'string', 'max:20'],
-    //             'customer_phone'  => ['required', 'string', 'max:13'],
-    //             'customer_email'  => ['nullable', 'email', 'max:255'],
-    //             'booking_date'    => ['required', 'date'],
-    //             'start_time'      => ['required', 'string', Rule::in($times)],
-    //             'end_time'        => ['required', 'string', Rule::in($times)],
-    //             'hours'           => ['required', 'numeric', 'min:1'],
-    //             'amount'          => ['required', 'numeric', 'min:0'],
-    //             'notes'           => ['nullable', 'string'],
-    //         ]);
-
-    //         $venueAdmin = VenueAdmin::where('venue_id', $validated['venue_id'])->first();
-
-    //         $validated['user_id'] = $venueAdmin->user_id;
-
-    //         $courtBelongsToVenue = Court::where('id', $validated['court_id'])
-    //             ->where('venue_id', $validated['venue_id'])
-    //             ->exists();
-
-    //         if (!$courtBelongsToVenue) {
-    //             return response()->json([
-    //                 'message' => 'This court does not belong to the specified venue.',
-    //                 'data' => [],
-    //                 'status' => 422,
-    //             ], 422);
-    //         }
-
-    //         $conflict = Booking::where('court_id', $validated['court_id'])
-    //             ->where('booking_date', $validated['booking_date'])
-    //             ->where('start_time', $validated['start_time'])
-    //             ->whereIn('status', ['pending', 'confirmed'])
-    //             ->exists();
-
-    //         if ($conflict) {
-    //             return response()->json([
-    //                 'message' => 'This time slot is already booked for this court.',
-    //                 'data' => [],
-    //                 'status' => 409,
-    //             ], 409);
-    //         }
-
-    //         $booking = Booking::create([
-    //             ...$validated,
-    //             'payment_method' => 'gcash',
-    //             'payment_status' => $validated['payment_status'] ?? 'pending',
-    //             'status' => $validated['status'] ?? 'pending',
-    //         ]);
-
-    //         return response()->json([
-    //             'message' => 'Booking successfully created.',
-    //             'data' => $booking,
-    //             'status' => 201,
-    //         ], 201);
-    //     } catch (ValidationException $e) {
-    //         return response()->json([
-    //             'message' => 'Validation Error.',
-    //             'errors' => $e->errors(),
-    //             'status' => 422,
-    //         ], 422);
-    //     } catch (\Illuminate\Database\QueryException $e) {
-    //         if ($e->getCode() === '23000') {
-    //             return response()->json([
-    //                 'message' => 'A booking with this code already exists.',
-    //                 'data' => [],
-    //                 'status' => 409,
-    //             ], 409);
-    //         }
-
-    //         report($e);
-
-    //         return response()->json([
-    //             'message' => 'Something is wrong. Please try again.',
-    //             'data' => $e->getMessage(),
-    //             'status' => 500,
-    //         ], 500);
-    //     } catch (\Throwable $th) {
-    //         report($th);
-
-    //         return response()->json([
-    //             'message' => 'Something is wrong. Please try again.',
-    //             'data' => $th->getMessage(),
-    //             'status' => 500,
-    //         ], 500);
-    //     }
-    // }
-
-    // public function attempUpdateAfterPayment(Request $request)
-    // {
-
-    //     try {
-
-    //         Booking::where('booking_code', $request->booking_code)->update([
-    //             'payment_method' => $request->payment_method,
-    //             'payment_status' => $request->payment_status,
-    //             'status' => 'confirmed',
-    //         ]);
-
-    //         return true;
-    //     } catch (ValidationException $e) {
-    //         return response()->json([
-    //             'message' => 'Validation Error.',
-    //             'errors' => $e->errors(),
-    //             'status' => 422,
-    //         ], 422);
-    //     } catch (\Illuminate\Database\QueryException $e) {
-    //         if ($e->getCode() === '23000') {
-    //             return response()->json([
-    //                 'message' => 'A booking with this code already exists.',
-    //                 'data' => [],
-    //                 'status' => 409,
-    //             ], 409);
-    //         }
-
-    //         report($e);
-
-    //         return response()->json([
-    //             'message' => 'Something is wrong. Please try again.',
-    //             'data' => [],
-    //             'status' => 500,
-    //         ], 500);
-    //     } catch (\Throwable $th) {
-    //         report($th);
-
-    //         return response()->json([
-    //             'message' => 'Something is wrong. Please try again.',
-    //             'data' => [],
-    //             'status' => 500,
-    //         ], 500);
-    //     }
-    // }
-
-
-
     public function attempUpdateAfterPayment(array $data)
     {
         try {
@@ -419,102 +252,6 @@ class BookingServices
         }
     }
 
-    // public function getBookingReservationByVenueId(Request $request)
-    // {
-    //     try {
-    //         $request->validate([
-    //             'venue_id' => 'required|integer|exists:venues,id',
-    //             'court_id' => 'required|integer|exists:courts,id',
-    //             'booking_date' => 'required|date',
-    //         ]);
-    //     } catch (\Throwable $th) {
-    //         return response()->json([
-    //             'message' => $th->getMessage(),
-    //             'data' => [],
-    //             'status' => 500,
-    //         ], 500);
-    //     }
-
-    //     try {
-    //         $dayStart = Carbon::parse($request->booking_date)->startOfDay();
-    //         $dayEnd   = $dayStart->copy()->endOfDay();
-
-    //         $bookings = Booking::where('venue_id', $request->venue_id)
-    //             ->where('court_id', $request->court_id)
-    //             ->where('status', '!=', 'cancelled')
-    //             ->where('start_datetime', '<', $dayEnd)
-    //             ->where('end_datetime', '>', $dayStart)
-    //             ->get(['start_datetime', 'end_datetime']);
-
-    //         $reservedTimes = $bookings
-    //             ->flatMap(fn($b) => $this->expandDatetimeRange($b->start_datetime, $b->end_datetime))
-    //             ->unique()
-    //             ->values();
-
-    //         return response()->json([
-    //             'message' => 'Successfully retrieved reservation time booking by Venues Id.',
-    //             'data' => $reservedTimes,
-    //             'status' => 200,
-    //         ], 200);
-    //     } catch (\Throwable $th) {
-    //         report($th);
-    //         return response()->json([
-    //             'message' => 'Something is wrong. Please try again.',
-    //             'data' => [],
-    //             'status' => 500,
-    //         ], 500);
-    //     }
-    // }
-
-
-    // public function getBookingReservationByVenueId(Request $request)
-    // {
-    //     try {
-    //         $request->validate([
-    //             'venue_id' => 'required|integer|exists:venues,id',
-    //             'court_id' => 'required|integer|exists:courts,id',
-    //             'booking_date' => 'required|date',
-    //         ]);
-    //     } catch (ValidationException $e) {
-    //         return response()->json([
-    //             'message' => 'Validation Error.',
-    //             'errors' => $e->errors(),
-    //             'status' => 422,
-    //         ], 422);
-    //     }
-
-    //     try {
-    //         $dayStart = Carbon::parse($request->booking_date)->startOfDay();
-    //         $dayEnd   = $dayStart->copy()->endOfDay();
-
-    //         $bookings = Booking::where('venue_id', $request->venue_id)
-    //             ->where('court_id', $request->court_id)
-    //             ->whereIn('status', ['confirmed', 'completed'])
-    //             ->where('payment_status', 'paid')
-    //             ->where('start_datetime', '<', $dayEnd)
-    //             ->where('end_datetime', '>', $dayStart)
-    //             ->get(['start_datetime', 'end_datetime']);
-
-    //         $reservedTimes = $bookings
-    //             ->flatMap(fn($b) => $this->expandDatetimeRange($b->start_datetime, $b->end_datetime, $dayStart, $dayEnd))
-    //             ->unique()
-    //             ->values();
-
-    //         return response()->json([
-    //             'message' => 'Successfully retrieved reservation time booking by Venues Id.',
-    //             'data' => $reservedTimes,
-    //             'status' => 200,
-    //         ], 200);
-    //     } catch (\Throwable $th) {
-    //         report($th);
-    //         return response()->json([
-    //             'message' => $th->getMessage(),
-    //             'data' => [],
-    //             'status' => 500,
-    //         ], 500);
-    //     }
-    // }
-
     public function getBookingReservationByVenueId(Request $request)
     {
         try {
@@ -537,21 +274,31 @@ class BookingServices
 
             $bookings = Booking::where('venue_id', $request->venue_id)
                 ->where('court_id', $request->court_id)
+                ->whereIn('status', ['completed', 'confirmed', 'pending'])
                 ->where('payment_status', 'paid')
-                ->whereIn('status', ['completed', 'confirmed'])
-                ->where('start_datetime', '<', $dayEnd)
-                ->where('end_datetime', '>', $dayStart)
+                ->where('start_datetime', '<=', $dayEnd)
+                ->where('end_datetime', '>=', $dayStart)
                 ->get(['start_datetime', 'end_datetime']);
 
             $reservedTimes = $bookings
-                ->flatMap(function ($b) use ($dayStart, $dayEnd) {
-                    $start = Carbon::parse($b->start_datetime)->max($dayStart);
-                    $end   = Carbon::parse($b->end_datetime)->min($dayEnd);
+                ->flatMap(function ($b) use ($dayStart) {
+                    $start  = Carbon::parse($b->start_datetime);
+                    $end    = Carbon::parse($b->end_datetime);
+                    $cursor = $start->copy();
+                    $slots  = [];
 
-                    return $this->expandDatetimeRange($start, $end);
+                    while ($cursor->lte($end)) {
+                        if ($cursor->isSameDay($dayStart)) {
+                            $slots[] = $cursor->format('H:i');
+                        }
+                        $cursor->addHour();
+                    }
+
+                    return $slots;
                 })
                 ->unique()
                 ->sort()
+                ->map(fn($time) => Carbon::createFromFormat('H:i', $time)->format('h:i A'))
                 ->values();
 
             return response()->json([
@@ -575,72 +322,12 @@ class BookingServices
         $cursor = $start->copy();
 
         while ($cursor->lt($end)) {
-            $times[] = $cursor->format('H:i');
+            $times[] = $cursor->copy();
             $cursor->addHour();
         }
 
         return $times;
     }
-
-    // private function expandDatetimeRange(Carbon $start, Carbon $end, Carbon $dayStart, Carbon $dayEnd): array
-    // {
-    //     $cursor = $start->copy()->max($dayStart);
-    //     $clampedEnd = $end->copy()->min($dayEnd->copy()->addSecond());
-
-    //     $slots = [];
-    //     while ($cursor->lt($clampedEnd)) {
-    //         $slots[] = $cursor->format('g:i A');
-    //         $cursor->addHour();
-    //     }
-    //     return $slots;
-    // }
-
-    // private function expandDatetimeRange(Carbon $start, Carbon $end): array
-    // {
-    //     $cursor = $start->copy();
-    //     $slots = [];
-    //     while ($cursor->lt($end)) {
-    //         $slots[] = $cursor->format('g:i A');
-    //         $cursor->addHour();
-    //     }
-    //     return $slots;
-    // }
-
-    // public function getBookingReservationByVenueId(Request $request)
-    // {
-    //     $request->validate([
-    //         'venue_id' => 'required|integer|exists:venues,id',
-    //         'booking_date' => 'required|date',
-    //     ]);
-
-    //     try {
-    //         $bookings = Booking::where('venue_id', $request->venue_id)
-    //             ->where('booking_date', $request->booking_date)
-    //             ->where('court_id', $request->court_id)
-    //             ->where('status', '!=', 'cancelled')
-    //             ->get(['start_time', 'end_time']);
-
-    //         $reservedTimes = $bookings
-    //             ->flatMap(fn($booking) => $this->expandTimeRange($booking->start_time, $booking->end_time))
-    //             ->unique()
-    //             ->values();
-
-    //         return response()->json([
-    //             'message' => 'Successfully retrieved reservation time booking by Venues Id.',
-    //             'data' => $reservedTimes,
-    //             'status' => 200,
-    //         ], 200);
-    //     } catch (\Throwable $th) {
-    //         report($th);
-
-    //         return response()->json([
-    //             'message' => 'Something is wrong. Please try again.',
-    //             'data' => [],
-    //             'status' => 500,
-    //         ], 500);
-    //     }
-    // }
-
     public function attemptGetBookingReservationChangeById(Request $request)
     {
         try {

@@ -618,13 +618,7 @@
 
 
 <script setup>
-import {
-    ref,
-    computed,
-    onMounted,
-    nextTick,
-    onBeforeUnmount
-} from 'vue'
+import { ref, watch, computed, onMounted, nextTick, onBeforeUnmount } from 'vue'
 
 import { TIMES } from '@/constants/times.js'
 import { COURT_COLOR_CYCLE } from '@/constants/courtcolor'
@@ -894,6 +888,8 @@ const selectDate = async (cell) => {
         return
     }
 
+    console.log(cell.key)
+
     date.value = cell.key
 
     selectedSlots.value = []
@@ -1048,10 +1044,8 @@ function selectSlot(slot) {
     const anchorIndex = timeIndex(anchor.time)
     const clickedIndex = timeIndex(slot.time)
 
-    // KEY LOGIC: if clicked time's index is before the anchor's, it must be tomorrow
     const clickedDayOffset = clickedIndex < anchorIndex ? 1 : 0
 
-    // Clicking the exact same time+day again resets the selection
     const isSameAsExisting = selectedSlots.value.some(
         s => s.time === slot.time && (s.dayOffset || 0) === clickedDayOffset
     )
@@ -1069,8 +1063,6 @@ function selectSlot(slot) {
         const dayOffset = Math.floor(i / HOURS_PER_DAY)
         const time = TIMES[i % HOURS_PER_DAY]
 
-        // NOTE: slots.value only has TODAY's reserved/blocked data.
-        // For dayOffset 1 (tomorrow), we don't have real data yet — see caveat below.
         const found = slots.value.find(s => s.time === time)
             ?? { time, taken: false, reserved: false, blocked: false }
 
@@ -1107,55 +1099,6 @@ function updateTimeLabel() {
         : `${start.time} – ${end.time}`
 }
 
-// function selectSlot(slot) {
-//     if (slot.taken || slot.reserved || slot.blocked) {
-//         return
-//     }
-
-//     const isAlreadySelected = selectedSlots.value.some(
-//         selected => selected.time === slot.time
-//     )
-
-//     if (isAlreadySelected) {
-//         selectedSlots.value = []
-//         updateTimeLabel()
-//         return
-//     }
-
-//     if (selectedSlots.value.length === 0) {
-//         selectedSlots.value = [slot]
-//         updateTimeLabel()
-//         return
-//     }
-
-//     const existingMinutes = selectedSlots.value.map(s => convertToMinutes(s.time))
-//     const clickedMinutes = convertToMinutes(slot.time)
-
-//     const rangeStart = Math.min(...existingMinutes, clickedMinutes)
-//     const rangeEnd = Math.max(...existingMinutes, clickedMinutes)
-
-//     const slotsInRange = slots.value.filter(s => {
-//         const m = convertToMinutes(s.time)
-//         return m >= rangeStart && m <= rangeEnd
-//     })
-
-//     const rangeHasBlocker = slotsInRange.some(
-//         s => s.taken || s.reserved || s.blocked
-//     )
-
-//     if (rangeHasBlocker) {
-//         selectedSlots.value = [slot]
-//     } else {
-//         selectedSlots.value = slotsInRange
-//     }
-
-//     selectedSlots.value.sort(
-//         (a, b) => convertToMinutes(a.time) - convertToMinutes(b.time)
-//     )
-
-//     updateTimeLabel()
-// }
-
 function clearSelectedTime() {
 
     selectedSlots.value = []
@@ -1164,37 +1107,6 @@ function clearSelectedTime() {
 
     totalHours.value = 0
 }
-
-// function updateTimeLabel() {
-//     if (selectedSlots.value.length === 0) {
-//         timeLabel.value = ''
-//         totalHours.value = 0
-//         return
-//     }
-
-//     const sorted = [...selectedSlots.value].sort((a, b) =>
-//         convertToMinutes(a.time) - convertToMinutes(b.time)
-//     )
-
-//     const startTime = sorted[0].time
-
-//     const lastSlotMinutes = convertToMinutes(
-//         sorted[sorted.length - 1].time
-//     )
-
-//     const endMinutes = lastSlotMinutes
-
-//     const endTime = formatMinutesToTime(endMinutes)
-
-//     const startMinutes = convertToMinutes(sorted[0].time)
-//     const endMinute = convertToMinutes(sorted[sorted.length - 1].time)
-
-//     const durationHours = (endMinute - startMinutes) / 60
-
-//     totalHours.value = durationHours
-
-//     timeLabel.value = `${startTime} – ${endTime}`
-// }
 
 const bookingTotal = computed(() => {
     if (selectedSlots.value.length < 2) {
@@ -1223,40 +1135,6 @@ const bookingTotal = computed(() => {
 
     return total
 })
-
-// const bookingTotal = computed(() => {
-//     if (selectedSlots.value.length < 2) {
-//         return 0;
-//     }
-
-//     const sorted = [...selectedSlots.value].sort(
-//         (a, b) =>
-//             convertToMinutes(a.time) -
-//             convertToMinutes(b.time)
-//     );
-
-//     const startMinutes = convertToMinutes(sorted[0].time);
-
-//     const endMinutes = convertToMinutes(
-//         sorted[sorted.length - 1].time
-//     );
-
-//     const hours = (endMinutes - startMinutes) / 60;
-
-//     const specialStart = convertToMinutes('5:00 AM');
-//     const specialEnd = convertToMinutes('4:00 PM');
-
-//     if (
-//         startMinutes >= specialStart &&
-//         endMinutes <= specialEnd
-//     ) {
-//         return hours * 200;
-//     }
-
-//     const price = Number(courtSelected.value?.price || 0);
-
-//     return hours * price;
-// });
 
 function incPlayers() {
     players.value++
@@ -1449,83 +1327,73 @@ function clearContactDetails() {
     notes.value = ''
 }
 
+let latestRequest = 0;
+
 const updateTimeDate = async () => {
-    let venue_id = venue.value?.id;
-    let court_id = selectedCourtId.value;
-
-    selectTimeReload.value = true;
-
-    const closeTimeCourt = await useCourt.courtCloseTime({ court_id: court_id, schedule: date.value });
-
-    if (closeTimeCourt) {
-        blockedTimes.value = closeTimeCourt?.closed_times;
-    } else {
-        blockedTimes.value = []
-    }
+    const venue_id = venue.value?.id;
+    const court_id = selectedCourtId.value;
+    if (!venue_id || !court_id) return;
 
     if (!date.value) {
-        const now = new Date()
-        date.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+        const now = new Date();
+        date.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     }
 
-    const reservedTimeCourt = await useBooking.getReservation({
-        venue_id: venue_id,
-        court_id: court_id,
-        booking_date: date.value
-    })
+    const requestId = ++latestRequest;
+    selectTimeReload.value = true;
 
+    try {
+        const [closeTimeCourt, reservedTimeCourt] = await Promise.all([
+            useCourt.courtCloseTime({ court_id, schedule: date.value }),
+            useBooking.getReservation({ venue_id, court_id, booking_date: date.value }),
+        ]);
 
-    if (reservedTimeCourt) {
-        reservedTimes.value = reservedTimeCourt;
-    } else {
-        reservedTimes.value = []
+        if (requestId !== latestRequest) return; // a newer request superseded this one
+
+        blockedTimes.value = closeTimeCourt?.closed_times ?? [];
+        reservedTimes.value = reservedTimeCourt ?? [];
+    } catch (e) {
+        if (requestId !== latestRequest) return;
+        blockedTimes.value = [];
+        reservedTimes.value = [];
+        // TODO: show an error toast
+    } finally {
+        if (requestId === latestRequest) selectTimeReload.value = false;
     }
-    selectTimeReload.value = false;
+};
 
-    const closingVenueDate = await useVenue.getVenueCloseDateById({ venue_id: venue_id })
-
-    if (closingVenueDate) {
-        venueClosedDates.value = closingVenueDate
-    } else {
+const loadVenueClosedDates = async (venue_id) => {
+    try {
+        venueClosedDates.value = (await useVenue.getVenueCloseDateById({ venue_id })) ?? [];
+    } catch (e) {
         venueClosedDates.value = [];
     }
+};
 
-}
+watch(() => venue.value?.id, (id) => id && loadVenueClosedDates(id), { immediate: true });
+
+let mapTimer = null;
 
 const openReservation = async () => {
-
     if (!courtSelected.value) {
-        return
+        return;
     }
 
-    updateTimeDate();
+    confirmed.value = false;
+    isOpen.value = true;
+    document.body.classList.add('reservation-open');
 
-    confirmed.value = false
+    await updateTimeDate();
 
-    isOpen.value = true
+    await nextTick();
+    mapTimer = setTimeout(() => map.value?.invalidateSize(), 300);
+};
 
-    document.body.classList.add(
-        'reservation-open'
-    )
-
-    nextTick(() => {
-        if (map.value) {
-            setTimeout(() => {
-                map.value.invalidateSize()
-            }, 300)
-        }
-
-    })
-}
-
-function closeReservation() {
-
-    isOpen.value = false
-
-    document.body.classList.remove(
-        'reservation-open'
-    )
-}
+const closeReservation = () => {
+    isOpen.value = false;
+    document.body.classList.remove('reservation-open');
+    clearTimeout(mapTimer);
+};
 
 function addDays(dateStr, days) {
     const d = new Date(dateStr)
@@ -1852,7 +1720,7 @@ onBeforeUnmount(() => {
     document.body.classList.remove(
         'reservation-open'
     )
-
+    clearTimeout(mapTimer);
     if (map.value) {
 
         map.value.remove()

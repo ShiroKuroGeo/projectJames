@@ -12,8 +12,6 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-php artisan storage:unlink && php artisan storage:link --force
-
 # php artisan migrate --force
 
 exec supervisord -c /etc/supervisor/supervisord.conf
