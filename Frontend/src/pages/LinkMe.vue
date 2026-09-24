@@ -362,27 +362,20 @@
                                 <div class="" v-show="selectTimeReload">
                                     Fetching. Please wait...
                                 </div>
-                                <button v-for="s in slots" v-show="!selectTimeReload" :key="s.time" type="button" class="slot" :class="{
+                                <button v-for="s in displaySlots" v-show="!selectTimeReload" :key="s.time" type="button" class="slot" :class="{
                                     taken: s.taken,
                                     reserved: s.reserved,
                                     blocked: s.blocked,
-                                    selected: selectedSlots.some(selected => selected.time === s.time)
-                                }" :disabled="s.taken" @click="!s.taken && selectSlot(s)">
+                                    selected: isSelected(s)
+                                }" :disabled="s.taken" @click="selectSlot(s)">
                                     <span class="slot-time">
                                         {{ s.time }}
+                                        <small v-if="s.dayOffset">(+1)</small>
                                     </span>
-                                    <span v-if="s.reserved" class="slot-status">
-                                        Reserved
-                                    </span>
-                                    <span v-else-if="s.blocked" class="slot-status">
-                                        Blocked
-                                    </span>
-                                    <span v-else-if="selectedSlots.some(selected => selected.time === s.time)" class="slot-status">
-                                        Selected
-                                    </span>
-                                    <span v-else class="slot-status">
-                                        Available
-                                    </span>
+                                    <span v-if="s.reserved" class="slot-status">Reserved</span>
+                                    <span v-else-if="s.blocked" class="slot-status">Blocked</span>
+                                    <span v-else-if="isSelected(s)" class="slot-status">Selected</span>
+                                    <span v-else class="slot-status">Available</span>
                                 </button>
                             </div>
                             <div v-if="selectedSlots.length" class="time-selection-summary">
@@ -651,6 +644,8 @@ const map = ref(null)
 const date = ref(null)
 const selectedSlots = ref([])
 const reservedTimes = ref([])
+const reservedNextTimes = ref([])
+const blockedNextTimes = ref([])
 const blockedTimes = ref([])
 const venueClosedDates = ref([])
 const totalHours = ref(0)
@@ -682,6 +677,8 @@ const viewYear = ref(
 const viewTags = (tag) => {
     return tag?.join(', ') ?? ''
 }
+
+const isSelected = (s) => selectedSlots.value.some(sel => sel.time === s.time && (sel.dayOffset || 0) === s.dayOffset)
 
 const viewMonth = ref(
     today.getMonth()
@@ -982,39 +979,6 @@ function formatMinutesToTime(
     return `${hours}:${formattedMinutes} ${period}`
 }
 
-
-const slotStatus = (time) => {
-
-    if (!time) {
-        return {
-            taken: false,
-            reserved: false,
-            blocked: false
-        }
-    }
-
-    const formatted =
-        normalize(time)
-
-    const isReserved = reservedTimes.value.some(slot => normalize(slot) === formatted)
-
-    const isBlocked =
-        !isReserved &&
-        blockedTimes.value.some(
-            slot =>
-                normalize(slot) === formatted
-        )
-
-    return {
-        taken:
-            isReserved ||
-            isBlocked,
-        reserved: isReserved,
-        blocked: isBlocked
-    }
-}
-
-
 const slots = computed(() => {
     return TIMES
         .map(t => ({
@@ -1063,10 +1027,7 @@ function selectSlot(slot) {
         const dayOffset = Math.floor(i / HOURS_PER_DAY)
         const time = TIMES[i % HOURS_PER_DAY]
 
-        const found = slots.value.find(s => s.time === time)
-            ?? { time, taken: false, reserved: false, blocked: false }
-
-        slotsInRange.push({ ...found, dayOffset })
+        slotsInRange.push({ time, dayOffset, ...statusFor(time, dayOffset) })
     }
 
     const rangeHasBlocker = slotsInRange.some(s => s.taken || s.reserved || s.blocked)
@@ -1077,6 +1038,34 @@ function selectSlot(slot) {
 
     updateTimeLabel()
 }
+
+const statusFrom = (time, reservedList, blockedList) => {
+    if (!time) return { taken: false, reserved: false, blocked: false }
+
+    const formatted = normalize(time)
+    const isReserved = reservedList.some(t => normalize(t) === formatted)
+    const isBlocked = !isReserved && blockedList.some(t => normalize(t) === formatted)
+
+    return { taken: isReserved || isBlocked, reserved: isReserved, blocked: isBlocked }
+}
+
+const slotStatus = (time) => statusFrom(time, reservedTimes.value, blockedTimes.value)
+
+const statusFor = (time, dayOffset) =>
+    dayOffset === 0
+        ? slotStatus(time)
+        : statusFrom(time, reservedNextTimes.value, blockedNextTimes.value)
+
+const displaySlots = computed(() => {
+    const anchor = selectedSlots.value[0]
+    const anchorIndex = anchor ? timeIndex(anchor.time) : -1
+
+    return slots.value.map(s =>
+        timeIndex(s.time) < anchorIndex
+            ? { time: s.time, dayOffset: 1, ...statusFor(s.time, 1) }  // next day
+            : { ...s, dayOffset: 0 }
+    )
+})
 
 function updateTimeLabel() {
     if (selectedSlots.value.length === 0) {
@@ -1343,15 +1332,21 @@ const updateTimeDate = async () => {
     selectTimeReload.value = true;
 
     try {
-        const [closeTimeCourt, reservedTimeCourt] = await Promise.all([
+        const next = addDays(date.value, 1)
+
+        const [closeToday, closeNext, resToday, resNext] = await Promise.all([
             useCourt.courtCloseTime({ court_id, schedule: date.value }),
+            useCourt.courtCloseTime({ court_id, schedule: next }),
             useBooking.getReservation({ venue_id, court_id, booking_date: date.value }),
+            useBooking.getReservation({ venue_id, court_id, booking_date: next }),
         ]);
 
-        if (requestId !== latestRequest) return; // a newer request superseded this one
+        if (requestId !== latestRequest) return;
 
-        blockedTimes.value = closeTimeCourt?.closed_times ?? [];
-        reservedTimes.value = reservedTimeCourt ?? [];
+        blockedTimes.value = closeToday?.closed_times ?? [];
+        blockedNextTimes.value = closeNext?.closed_times ?? [];
+        reservedTimes.value = resToday ?? [];
+        reservedNextTimes.value = resNext ?? [];
     } catch (e) {
         if (requestId !== latestRequest) return;
         blockedTimes.value = [];
@@ -1396,9 +1391,9 @@ const closeReservation = () => {
 };
 
 function addDays(dateStr, days) {
-    const d = new Date(dateStr)
-    d.setDate(d.getDate() + days)
-    return d.toISOString().split('T')[0]
+    const [y, m, d] = dateStr.split('-').map(Number)
+    const dt = new Date(y, m - 1, d + days)
+    return keyOf(dt.getFullYear(), dt.getMonth(), dt.getDate())
 }
 
 function convertTo24Hour(time) {
