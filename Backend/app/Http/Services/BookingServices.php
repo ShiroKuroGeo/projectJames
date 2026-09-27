@@ -54,6 +54,7 @@ class BookingServices
 
                 $conflict = Booking::where('court_id', $validated['court_id'])
                     ->where('status', 'confirmed')
+                    ->where('payment_status', 'paid')
                     ->where('start_datetime', '<', $endDatetime)
                     ->where('end_datetime', '>', $startDatetime)
                     // ->lockForUpdate()

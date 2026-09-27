@@ -20,7 +20,7 @@ class PaymentServices
             ]);
 
             $payment = Payment::create($validation);
-            
+
             return response()->json([
                 'message' => 'Payment method created successfully.',
                 'data' => $payment,
@@ -60,13 +60,30 @@ class PaymentServices
             $paymentType = Payment::where('user_id', $booking->user_id)->pluck('payment_type');
             $paymentImage = Payment::where('user_id', $booking->user_id)->pluck('image', 'payment_type');
 
-            $startHour = Carbon::parse($booking->start_datetime)->hour;
+            $start = Carbon::parse($booking->start_datetime);
+            $end = Carbon::parse($booking->end_datetime);
 
-            $totalCost = ($startHour >= 6 && $startHour < 16)
-                ? 200 * $booking->hours
-                : $booking->court->price * $booking->hours;
+            $price = $booking->court->price;
+            $specialRate = 200;
+            $specialStartHour = 5;
+            $specialEndHour = 17;
+
+            $totalCost = 0;
+            $cursor = $start->copy();
+
+            while ($cursor->lt($end)) {
+                $hourOfDay = (int) $cursor->format('G');
+                $isSpecialHour = $hourOfDay >= $specialStartHour && $hourOfDay < $specialEndHour;
+                $totalCost += $isSpecialHour ? $specialRate : $price;
+                $cursor->addHour();
+            }
 
             $downpayment = $totalCost * 0.5;
+
+            $startHour = (int) $start->format('G');
+            $courtPrice = ($startHour >= $specialStartHour && $startHour < $specialEndHour)
+                ? $specialRate
+                : $price;
 
             $reservation = [
                 'label' => $booking->court->name,
@@ -74,6 +91,20 @@ class PaymentServices
                 'start_time' => $booking->start_datetime,
                 'end_time' => $booking->end_datetime,
                 'court' => $booking->court->name,
+                'court_price' => $courtPrice,
+                'venues' => $booking->venue->name,
+                'location' => $booking->venue->area,
+                'hours' => $booking->hours,
+                'customer_name' => $booking->customer_name,
+            ];
+
+            $reservation = [
+                'label' => $booking->court->name,
+                'amount' => $downpayment,
+                'start_time' => $booking->start_datetime,
+                'end_time' => $booking->end_datetime,
+                'court' => $booking->court->name,
+                'court_price' => $courtPrice,
                 'venues' => $booking->venue->name,
                 'location' => $booking->venue->area,
                 'hours' => $booking->hours,

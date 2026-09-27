@@ -301,7 +301,7 @@ const handleBack = () => {
                     <div class="side-card">
                         <div class="side-row">
                             <span>{{ reservations.label || 'Court booking' }}</span>
-                            <span>₱{{ reservations.amount ?? total }}</span>
+                            <span>₱{{ reservations.court_price }}</span>
                         </div>
                         <div class="side-total">
                             <span>Total Downpayment: </span>
