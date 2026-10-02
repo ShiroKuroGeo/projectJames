@@ -800,45 +800,20 @@ function shiftMonth(direction) {
 }
 
 function isDateBlocked(cell) {
-
-    if (!cell) {
-        return true
-    }
-
-    const isClosed =
-        venueClosedDates.value.some(
-            item =>
-                item.closed_date === cell.key
-        )
-
-    return (
-        isClosed ||
-        cell.disabled
-    )
+    if (!cell) return true
+    return isDateClosed(cell.key) || cell.disabled
 }
 
-
 const cellClass = cell => {
-
-    if (!cell) {
-        return 'empty'
-    }
-
-    const closed =
-        venueClosedDates.value.some(
-            item =>
-                item.closed_date === cell.key
-        )
-
+    if (!cell) return 'empty'
+    const closed = isDateClosed(cell.key)
     return {
         disabled: isDateBlocked(cell),
         today: cell.isToday,
-        selected:
-            date.value === cell.key,
+        selected: date.value === cell.key,
         blocked: closed
     }
 }
-
 
 const dateLabel = computed(() => {
 
@@ -894,7 +869,7 @@ function normalize(time) {
     if (!time) return ''
 
     const t = time.toString().trim().toUpperCase()
-    const match = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/)
+    const match = t.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?$/)  // allow optional :SS
 
     if (!match) return t
 
@@ -1035,7 +1010,7 @@ const statusFrom = (time, reservedList, blockedList) => {
 
     const formatted = normalize(time)
     const isReserved = reservedList.some(t => normalize(t) === formatted)
-    const isBlocked = !isReserved && blockedList.some(t => normalize(t) === formatted)
+    const isBlocked = blockedList.some(t => normalize(t) === formatted)
 
     return { taken: isReserved || isBlocked, reserved: isReserved, blocked: isBlocked }
 }
@@ -1361,8 +1336,7 @@ const updateTimeDate = async () => {
         if (requestId !== latestRequest) return;
 
         blockedTimes.value = closeToday ?? [];
-        // if the next day is a venue close date, block all of its slots
-        blockedNextTimes.value = nextClosed ? [...allTimeSlots] : (closeNext ?? []);
+        blockedNextTimes.value = nextClosed ? [...TIMES] : (closeNext ?? []);
         reservedTimes.value = resToday ?? [];
         reservedNextTimes.value = resNext ?? [];
     } catch (e) {
