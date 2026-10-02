@@ -25,8 +25,7 @@
                         </div>
                         <div class="court-tabs">
                             {{ currentVenueId }}
-                            <button v-for="c in managedVenues" :key="c.id" class="court-tab"
-                                :class="{ active: currentVenueId === c.id }" @click="changeVenue(c.id)">
+                            <button v-for="c in managedVenues" :key="c.id" class="court-tab" :class="{ active: currentVenueId === c.id }" @click="changeVenue(c.id)">
                                 {{ c.name }}
                             </button>
                         </div>
@@ -85,8 +84,7 @@
                     </div>
 
                     <div class="court-tabs">
-                        <button v-for="c in managedVenues" :key="c.id" class="court-tab"
-                            :class="{ active: currentVenueId === c.id }" @click="changeVenue(c.id)">
+                        <button v-for="c in managedVenues" :key="c.id" class="court-tab" :class="{ active: currentVenueId === c.id }" @click="changeVenue(c.id)">
                             {{ c.name }}
                         </button>
                     </div>
@@ -118,8 +116,7 @@
                             }}</span>
                         </div>
                         <div class="cal-grid">
-                            <div v-for="(cell, i) in calendarCells" :key="i" class="cal-day" :class="cellClass(cell)"
-                                @click="cell && !cell.disabled && toggleSchedule(cell)">
+                            <div v-for="(cell, i) in calendarCells" :key="i" class="cal-day" :class="cellClass(cell)" @click="cell && !cell.disabled && toggleSchedule(cell)">
                                 {{ cell ? cell.day : '' }}
                             </div>
                         </div>
@@ -133,13 +130,11 @@
                                 <span class="card-tag mono">Today's schedule</span>
                                 <h2 class="card-title small">{{ scheduleDateLabel }}</h2>
                             </div>
-                            <input type="date" class="date-input mono" :min="todayKey" :max="maxKey"
-                                v-model="scheduleDate" @change="fetchCourtSchedule(activeCourtId)">
+                            <input type="date" class="date-input mono" :min="todayKey" :max="maxKey" v-model="scheduleDate" @change="fetchCourtSchedule(activeCourtId)">
                         </div>
 
                         <div class="court-tabs">
-                            <button v-for="c in COURT_NAMES" :key="c.id" class="court-tab"
-                                :class="{ active: activeCourtId === c.id }" @click="selectedCourt(c.id)">
+                            <button v-for="c in COURT_NAMES" :key="c.id" class="court-tab" :class="{ active: activeCourtId === c.id }" @click="selectedCourt(c.id)">
                                 {{ c.name }}
                             </button>
                         </div>
@@ -152,8 +147,7 @@
                         </div>
 
                         <div class="schedule-grid">
-                            <div v-for="t in TIMES" :key="t" class="schedule-slot" :class="slotStatus(t)"
-                                @click="handleSlotClick(t)">
+                            <div v-for="t in TIMES" :key="t" class="schedule-slot" :class="slotStatus(t)" @click="handleSlotClick(t)">
                                 <span class="slot-time mono">{{ t }}</span>
                                 <span class="slot-state mono">{{ slotStatusLabel(t) }}</span>
                             </div>
@@ -165,8 +159,7 @@
                         </div>
 
                         <div class="court-tabs">
-                            <button v-for="c in COURT_NAMES" :key="c.id" class="court-tab"
-                                :class="{ active: activeCourtId === c.id }" @click="selectedCourt(c.id)">
+                            <button v-for="c in COURT_NAMES" :key="c.id" class="court-tab" :class="{ active: activeCourtId === c.id }" @click="selectedCourt(c.id)">
                                 {{ c.name }}
                             </button>
                         </div>
@@ -176,8 +169,7 @@
 
                 <div class="admin-card" v-show="tab === 'booking'">
                     <div class="filter-bar">
-                        <input v-model="search" type="text" class="search-input"
-                            placeholder="Search name, phone, or code…">
+                        <input v-model="search" type="text" class="search-input" placeholder="Search name, phone, or code…">
                         <select v-model="venueFilter" class="filter-select">
                             <option value="">All venues</option>
                             <option v-for="v in VENUES" :key="v.id" :value="v.id">{{ v.name }}</option>
@@ -201,11 +193,11 @@
                             <div class="status-rail" :class="b.status"></div>
 
                             <div class="booking-row-body">
-                                <div class="booking-row-main" :class="{ open: expandedCode === b.code }"
-                                    @click="toggleExpand(b.code)">
+                                <div class="booking-row-main" :class="{ open: expandedCode === b.code }" @click="toggleExpand(b.code)">
                                     <div class="booking-row-left">
                                         <div class="booking-code mono">{{ b.code }}
-                                        <span class="status-badge-payment" :class="b.paymentStatus">{{ b.paymentStatus }}</span></div>
+                                            <span class="status-badge-payment" :class="b.paymentStatus">{{ b.paymentStatus }}</span>
+                                        </div>
                                         <div class="booking-name">{{ b.customerName }}</div>
                                         <div class="booking-meta mono">{{ b.venueName }} · {{ b.courtName }}</div>
                                     </div>
@@ -243,37 +235,29 @@
                                     </div>
 
                                     <div class="expand-note payment-proof" v-if="b.raw?.submitted_payment?.image">
-                                        <img :src="image(b.raw.submitted_payment.image)" alt="Payment proof"
-                                            class="payment-proof-image"
-                                            @click="openPaymentModal(b.raw.submitted_payment.image)">
+                                        <img :src="image(b.raw.submitted_payment.image)" alt="Payment proof" class="payment-proof-image" @click="openPaymentModal(b.raw.submitted_payment.image)">
                                     </div>
 
                                     <div v-if="showPaymentModal" class="payment-modal" @click.self="closePaymentModal">
                                         <div class="payment-modal-content">
-                                            <button class="payment-modal-close" type="button"
-                                                @click="closePaymentModal">
+                                            <button class="payment-modal-close" type="button" @click="closePaymentModal">
                                                 ×
                                             </button>
 
-                                            <img v-if="selectedPaymentImage" :src="image(selectedPaymentImage)"
-                                                alt="Payment proof" class="payment-modal-image">
+                                            <img v-if="selectedPaymentImage" :src="image(selectedPaymentImage)" alt="Payment proof" class="payment-modal-image">
                                         </div>
                                     </div>
                                     <div class="expand-actions">
-                                        <button v-if="b.paymentStatus === 'downpayment'" class="action-btn primary"
-                                            @click="markFullyPaid(b)">
+                                        <button v-if="b.paymentStatus === 'downpayment'" class="action-btn primary" @click="markFullyPaid(b)">
                                             Mark fully paid
                                         </button>
-                                        <button v-if="b.status === 'confirmed'" class="action-btn success"
-                                            @click="completeBooking(b)">
+                                        <button v-if="b.status === 'confirmed'" class="action-btn success" @click="completeBooking(b)">
                                             Mark complete
                                         </button>
-                                        <button v-if="b.status === 'pending' || b.paymentStatus === 'pending'"
-                                            class="action-btn ghost-danger" @click="cancelBooking(b)">
+                                        <button v-if="b.status === 'pending' || b.paymentStatus === 'pending'" class="action-btn ghost-danger" @click="cancelBooking(b)">
                                             Cancel booking
                                         </button>
-                                        <button v-if="b.status === 'pending' && b.paymentStatus === 'paid'"
-                                            class="action-btn success" @click="confirmBooking(b)">
+                                        <button v-if="b.status === 'pending' && b.paymentStatus === 'paid'" class="action-btn success" @click="confirmBooking(b)">
                                             Confirm Booking
                                         </button>
                                     </div>
@@ -538,8 +522,10 @@ const fetchCourtSchedule = async (id) => {
         court_id: id
     });
 
-    blockedTimes.value = closeRes?.[0]?.closed_times ?? closeRes?.closed_times ?? [];
-    reservedTimes.value = reserveRes
+    blockedTimes.value = closeRes ?? []
+    reservedTimes.value = reserveRes ?? []
+
+    console.log(closeRes)
 }
 
 const canGoNextMonth = computed(() => {
@@ -561,63 +547,91 @@ const toggleSchedule = async (cell) => {
         item => item.closed_date === cell.key
     );
 
+    // ---------- UNBLOCK ----------
     if (existingIndex !== -1) {
         const existingRecord = venueClosedDates.value[existingIndex];
 
-        try {
-            await useVenue.deleteVenueCloseDate({ id: existingRecord.id });
-
-            venueClosedDates.value.splice(existingIndex, 1);
-        } catch (error) {
-            console.error('Failed to unblock date:', error);
-        }
-
-    } else {
-        const payload = {
-            venue_id: activeVenue.value.id,
-            closed_date: cell.key,
-            reason: 'Default Reason'
-        };
-
-        try {
-
-            const result = await Swal.fire({
-                title: 'Are you sure?',
-                text: 'Do you want to set this venue close date?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, set it!',
-                cancelButtonText: 'Cancel',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33'
-            });
-
-            if (result.isConfirmed) {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to remove this venue close date?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, remove it!',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            showLoaderOnConfirm: true,
+            allowOutsideClick: () => !Swal.isLoading(),
+            allowEscapeKey: () => !Swal.isLoading(),
+            preConfirm: async () => {
                 try {
-                    const response = await useVenue.setVenueCloseDate(payload);
-
-                    const newRecord = response?.data ?? { ...payload, id: response };
-                    venueClosedDates.value.push(newRecord);
-
-                    await Swal.fire({
-                        title: 'Success!',
-                        text: 'Venue close date has been set.',
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
+                    await useVenue.deleteVenueCloseDate({ id: existingRecord.id });
+                    return true;
                 } catch (error) {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Failed to set venue close date.',
-                        icon: 'error'
-                    });
+                    console.error('Failed to unblock date:', error);
+                    Swal.showValidationMessage('Failed to remove venue close date.');
+                    return false; // keeps the dialog open
                 }
             }
+        });
 
-        } catch (error) {
-            console.error('Failed to block date:', error);
+        if (result.isConfirmed) {
+            // re-find the index in case the list changed while the request ran
+            const idx = venueClosedDates.value.findIndex(i => i.id === existingRecord.id);
+            if (idx !== -1) venueClosedDates.value.splice(idx, 1);
+
+            Swal.fire({
+                title: 'Success!',
+                text: 'Venue close date has been removed.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
         }
+        return;
+    }
+
+    // ---------- BLOCK ----------
+    const payload = {
+        venue_id: activeVenue.value.id,
+        closed_date: cell.key,
+        reason: 'Default Reason'
+    };
+
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to set this venue close date?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, set it!',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        showLoaderOnConfirm: true,
+        allowOutsideClick: () => !Swal.isLoading(),
+        allowEscapeKey: () => !Swal.isLoading(),
+        preConfirm: async () => {
+            try {
+                const response = await useVenue.setVenueCloseDate(payload);
+                return response?.data ?? { ...payload, id: response };
+            } catch (error) {
+                console.error('Failed to block date:', error);
+                Swal.showValidationMessage('Failed to set venue close date.');
+                return false;
+            }
+        }
+    });
+
+    if (result.isConfirmed) {
+        venueClosedDates.value.push(result.value); // value returned by preConfirm
+
+        Swal.fire({
+            title: 'Success!',
+            text: 'Venue close date has been set.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+        });
     }
 };
 
@@ -723,11 +737,12 @@ const handleSlotClick = async (t) => {
     if (isReserved) return;
 
     const isCurrentlyBlocked = blockedTimes.value.some(x => normalize(x) === formattedSlot);
-
-    // Dynamic action text based on whether we are blocking or unblocking
     const action = isCurrentlyBlocked ? 'unblock' : 'block';
 
-    // 1. Show confirmation alert
+    const next = isCurrentlyBlocked
+        ? blockedTimes.value.filter(x => normalize(x) !== formattedSlot)
+        : [...blockedTimes.value, t];
+
     const result = await Swal.fire({
         title: 'Are you sure?',
         text: `Do you want to ${action} ${t} on ${scheduleDate.value}?`,
@@ -735,38 +750,34 @@ const handleSlotClick = async (t) => {
         showCancelButton: true,
         confirmButtonText: `Yes, ${action} it!`,
         cancelButtonText: 'Cancel',
-        confirmButtonColor: isCurrentlyBlocked ? '#3085d6' : '#d33'
+        confirmButtonColor: isCurrentlyBlocked ? '#3085d6' : '#d33',
+        showLoaderOnConfirm: true,
+        allowOutsideClick: () => !Swal.isLoading(),
+        allowEscapeKey: () => !Swal.isLoading(),
+        preConfirm: async () => {
+            try {
+                const res = await useCourt.setCourtClosedTime({
+                    court_id: activeCourtId.value,
+                    closed_date: scheduleDate.value,
+                    closed_times: next
+                });
+                return res;
+            } catch (error) {
+                Swal.showValidationMessage('Failed to update court closed times.');
+                return false; // keeps the dialog open
+            }
+        }
     });
 
-    if (!result.isConfirmed) return;
-
-    // 2. Prepare payload
-    const next = isCurrentlyBlocked
-        ? blockedTimes.value.filter(x => normalize(x) !== formattedSlot)
-        : [...blockedTimes.value, t];
-
-    // Optimistic UI update
-    const previousBlockedTimes = [...blockedTimes.value];
-    blockedTimes.value = next;
-
-    const payload = {
-        court_id: activeCourtId.value,
-        closed_date: scheduleDate.value,
-        closed_times: next
-    };
-
-    // 3. Perform API call
-    try {
-        await useCourt.setCourtClosedTime(payload);
-    } catch (error) {
-        // Revert state and refresh schedule on error
-        blockedTimes.value = previousBlockedTimes;
-        await fetchCourtSchedule(activeCourtId.value);
+    if (result.isConfirmed) {
+        blockedTimes.value = next;
 
         Swal.fire({
-            title: 'Error!',
-            text: 'Failed to update court closed times.',
-            icon: 'error'
+            title: 'Success!',
+            text: `Time slot ${action}ed successfully.`,
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
         });
     }
 };

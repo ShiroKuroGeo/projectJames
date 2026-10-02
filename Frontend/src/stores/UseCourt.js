@@ -40,7 +40,6 @@ export const useCourtStore = defineStore('CourtStore', () => {
                 'closed_times'
             ];
             const response = await api.post('admin/create/court/closeTime', courtData)
-
             return response.data.data;
 
         } catch (err) {
