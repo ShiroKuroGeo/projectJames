@@ -953,13 +953,27 @@ function normalizeTime(time) {
     return `${h.padStart(2, '0')}:${m} ${meridiem.toUpperCase()}`
 }
 
-function timeIndex(time) {
-    return TIMES.indexOf(normalizeTime(time))
+// function timeIndex(time) {
+//     return TIMES.indexOf(normalizeTime(time))
+// }
+
+function timeIndex(label) {
+    return TIMES.indexOf(label)
 }
 
-function effectiveIndex(time, dayOffset = 0) {
-    return timeIndex(time) + dayOffset * HOURS_PER_DAY
+function effectiveIndex(label, dayOffset = 0) {
+    return timeIndex(label) + dayOffset * HOURS_PER_DAY
 }
+
+function hourLabel(h) {
+    h = h % 24
+    const period = h >= 12 ? 'PM' : 'AM'
+    return `${h % 12 || 12}:00 ${period}`
+}
+
+// function effectiveIndex(time, dayOffset = 0) {
+//     return timeIndex(time) + dayOffset * HOURS_PER_DAY
+// }
 
 function selectSlot(slot) {
     if (slot.taken || slot.reserved || slot.blocked) return
@@ -1005,12 +1019,18 @@ function selectSlot(slot) {
     updateTimeLabel()
 }
 
+const toHourKey = (value) => {
+    if (!value) return ''
+    const i = TIMES.indexOf(value)
+    return i !== -1 ? `${pad(i)}:00` : normalize(value)
+}
+
 const statusFrom = (time, reservedList, blockedList) => {
     if (!time) return { taken: false, reserved: false, blocked: false }
 
-    const formatted = normalize(time)
-    const isReserved = reservedList.some(t => normalize(t) === formatted)
-    const isBlocked = blockedList.some(t => normalize(t) === formatted)
+    const key = toHourKey(time)
+    const isReserved = reservedList.some(t => toHourKey(t) === key)
+    const isBlocked = blockedList.some(t => toHourKey(t) === key)
 
     return { taken: isReserved || isBlocked, reserved: isReserved, blocked: isBlocked }
 }
@@ -1044,14 +1064,14 @@ function updateTimeLabel() {
         (a, b) => effectiveIndex(a.time, a.dayOffset) - effectiveIndex(b.time, b.dayOffset)
     )
 
-    const start = sorted[0]
-    const end = sorted[sorted.length - 1]
+    const startEff = effectiveIndex(sorted[0].time, sorted[0].dayOffset)
+    const lastSlot = sorted[sorted.length - 1]
+    const endEff = effectiveIndex(lastSlot.time, lastSlot.dayOffset) + 1 // slot end
 
-    totalHours.value = effectiveIndex(end.time, end.dayOffset) - effectiveIndex(start.time, start.dayOffset)
+    totalHours.value = endEff - startEff
 
-    timeLabel.value = end.dayOffset > 0
-        ? `${start.time} – ${end.time} (next day)`
-        : `${start.time} – ${end.time}`
+    const label = `${hourLabel(startEff)} – ${hourLabel(endEff)}`
+    timeLabel.value = endEff > HOURS_PER_DAY ? `${label} (next day)` : label
 }
 
 function clearSelectedTime() {
@@ -1063,33 +1083,23 @@ function clearSelectedTime() {
     totalHours.value = 0
 }
 
+const SPECIAL_START_HOUR = 5   // 5:00 AM
+const SPECIAL_END_HOUR = 17    // 5:00 PM (exclusive)
+const SPECIAL_RATE = 200
+
 const bookingTotal = computed(() => {
-    if (selectedSlots.value.length < 2) {
-        return 0
-    }
+    if (!selectedSlots.value.length) return 0
 
-    const sorted = [...selectedSlots.value].sort(
-        (a, b) => effectiveIndex(a.time, a.dayOffset) - effectiveIndex(b.time, b.dayOffset)
-    )
-
-    const startIdx = effectiveIndex(sorted[0].time, sorted[0].dayOffset)
-    const endIdx = effectiveIndex(sorted[sorted.length - 1].time, sorted[sorted.length - 1].dayOffset)
-
-    const specialStartIdx = timeIndex('5:00 AM')
-    const specialEndIdx = timeIndex('5:00 PM')
-
+    const effs = selectedSlots.value.map(s => effectiveIndex(s.time, s.dayOffset))
     const price = Number(courtSelected.value?.price || 0)
 
-    let total = 0
-
-    for (let i = startIdx; i < endIdx; i++) {
-        const hourOfDayIdx = i % HOURS_PER_DAY
-        const isSpecialHour = hourOfDayIdx >= specialStartIdx && hourOfDayIdx < specialEndIdx
-        total += isSpecialHour ? 200 : price
-    }
-
-    return total
+    return effs.reduce((total, eff) => {
+        const hour = eff % HOURS_PER_DAY
+        const special = hour >= SPECIAL_START_HOUR && hour < SPECIAL_END_HOUR
+        return total + (special ? SPECIAL_RATE : price)
+    }, 0)
 })
+
 
 function incPlayers() {
     players.value++
@@ -1393,7 +1403,7 @@ function convertTo24Hour(time) {
 
     if (meridiem === 'AM') {
         if (hour === 12) hour = 0
-    } else { // PM
+    } else {
         if (hour !== 12) hour += 12
     }
 
@@ -1404,15 +1414,19 @@ function getBookingTime(selected) {
     const sorted = [...selected].sort(
         (a, b) => effectiveIndex(a.time, a.dayOffset) - effectiveIndex(b.time, b.dayOffset)
     )
-    const start = sorted[0]
-    const end = sorted[sorted.length - 1]
 
-    const startDate = date.value // e.g. '2026-09-06'
-    const endDate = end.dayOffset > 0 ? addDays(date.value, 1) : startDate
+    const startEff = effectiveIndex(sorted[0].time, sorted[0].dayOffset)
+    const last = sorted[sorted.length - 1]
+    const endEff = effectiveIndex(last.time, last.dayOffset) + 1
+
+    const fmt = (eff) => {
+        const d = addDays(date.value, Math.floor(eff / HOURS_PER_DAY))
+        return `${d} ${pad(eff % HOURS_PER_DAY)}:00:00`
+    }
 
     return {
-        start_datetime: `${startDate} ${convertTo24Hour(start.time)}`,
-        end_datetime: `${endDate} ${convertTo24Hour(end.time)}`,
+        start_datetime: fmt(startEff),
+        end_datetime: fmt(endEff),   // 11 PM slot -> next day 00:00:00
         hours: totalHours.value
     }
 }
@@ -4087,7 +4101,6 @@ button {
     line-height: 1.5;
 }
 
-
 .time-empty span {
     width: 25px;
     height: 25px;
@@ -4115,7 +4128,7 @@ button {
     display: grid;
 
     grid-template-columns:
-        repeat(3, 1fr);
+        repeat(2, 1fr);
 
     gap: 7px;
 }
