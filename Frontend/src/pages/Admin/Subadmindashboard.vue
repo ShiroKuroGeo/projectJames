@@ -311,7 +311,22 @@ const managedVenues = ref([]);
 const activeVenue = ref('');
 const expandedCode = ref(null);
 
-const normalize = (t) => t.toString().trim().toUpperCase().replace(/^0/, '');
+const normalize = (value) => {
+    if (!value) return '';
+    const str = value.toString().trim();
+
+    const idx = TIMES.indexOf(str);
+    if (idx !== -1) return `${String(idx).padStart(2, '0')}:00`;
+
+    const m = str.toUpperCase().match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?$/);
+    if (!m) return str.toUpperCase();
+
+    let hour = parseInt(m[1], 10);
+    if (m[3] === 'PM' && hour !== 12) hour += 12;
+    if (m[3] === 'AM' && hour === 12) hour = 0;
+
+    return `${String(hour).padStart(2, '0')}:${m[2]}`;
+};
 const currentVenueId = computed(() => activeVenue.value ? activeVenue.value.id : null);
 
 const currentAdmin = computed(() => useAuth.user);
