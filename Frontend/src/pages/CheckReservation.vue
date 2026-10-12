@@ -327,12 +327,10 @@
                                                 DURATION
                                             </span>
                                             <span class="detail-value">
-                                                {{ r.hours || '—' }}
-                                                {{
-                                                    Number(r.hours) === 1
-                                                        ? 'hour'
-                                                        : 'hours'
-                                                }}
+                                                {{ formatTimeRange(r.start_datetime) }} - {{ formatTimeRange(r.end_datetime) }}
+                                                (
+                                                    <small>{{ r.hours || '—' }} {{ Number(r.hours) === 1 ? 'hour' : 'hours' }}</small>
+                                                )
                                             </span>
                                         </div>
 
@@ -380,6 +378,7 @@
                                         <strong class="mono">
                                             {{ r.booking_code }}
                                         </strong>
+
 
                                     </div>
 
@@ -486,6 +485,21 @@ const handleSearch = async () => {
 
     }
 };
+
+function formatTimeRange(dateString) {
+    const date = new Date(dateString.replace(' ', 'T'));
+
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12;
+    hours = hours ? hours : 12; // convert 0 to 12 for 12 AM
+
+    const formattedHour = String(hours).padStart(2, '0');
+
+    return `${formattedHour}:${minutes} ${ampm}`;
+}
 
 
 const viewTags = (tag) => {
