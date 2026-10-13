@@ -257,28 +257,28 @@ class BookingServices
     {
         try {
             $request->validate([
-                'venue_id' => 'required|integer|exists:venues,id',
-                'court_id' => 'required|integer|exists:courts,id',
+                'venue_id'     => 'required|integer|exists:venues,id',
+                'court_id'     => 'required|integer|exists:courts,id',
                 'booking_date' => 'required|date',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation Error.',
-                'errors' => $e->errors(),
-                'status' => 422,
+                'errors'  => $e->errors(),
+                'status'  => 422,
             ], 422);
         }
 
         try {
             $dayStart = Carbon::parse($request->booking_date)->startOfDay();
-            $dayEnd   = $dayStart->copy()->endOfDay();
+            $dayEnd   = $dayStart->copy()->addDay()->startOfDay(); // next day 00:00:00
 
             $bookings = Booking::where('venue_id', $request->venue_id)
                 ->where('court_id', $request->court_id)
                 ->whereIn('status', ['completed', 'confirmed', 'pending'])
                 ->where('payment_status', 'paid')
-                ->where('start_datetime', '<=', $dayEnd)
-                ->where('end_datetime', '>=', $dayStart)
+                ->where('start_datetime', '<', $dayEnd)
+                ->where('end_datetime', '>', $dayStart)
                 ->get(['start_datetime', 'end_datetime']);
 
             $reservedTimes = $bookings
@@ -288,7 +288,8 @@ class BookingServices
                     $cursor = $start->copy();
                     $slots  = [];
 
-                    while ($cursor->lte($end)) {
+                    // lt (not lte): the end hour is NOT part of the booking
+                    while ($cursor->lt($end)) {
                         if ($cursor->isSameDay($dayStart)) {
                             $slots[] = $cursor->format('H:i');
                         }
@@ -304,15 +305,15 @@ class BookingServices
 
             return response()->json([
                 'message' => 'Successfully retrieved reservation time booking by Venues Id.',
-                'data' => $reservedTimes,
-                'status' => 200,
+                'data'    => $reservedTimes,
+                'status'  => 200,
             ], 200);
         } catch (\Throwable $th) {
             report($th);
             return response()->json([
                 'message' => $th->getMessage(),
-                'data' => [],
-                'status' => 500,
+                'data'    => [],
+                'status'  => 500,
             ], 500);
         }
     }
