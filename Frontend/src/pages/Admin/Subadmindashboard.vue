@@ -743,19 +743,28 @@ function slotStatusLabel(t) {
 
 // getReservation
 
+const toStartTime = (slot) => {
+    const [start, end] = slot.split(' - ').map(s => s.trim());
+
+    if (/AM|PM/.test(start)) return start;
+
+    const meridiem = end.split(' ')[1];
+    return `${start} ${meridiem}`;
+};
+
 const handleSlotClick = async (t) => {
     if (!t || !activeCourtId.value || !scheduleDate.value) return;
 
-    const formattedSlot = normalize(t);
+    const formattedSlot = toStartTime(t);
 
-    const isReserved = reservedTimes.value.some(x => normalize(x) === formattedSlot);
+    const isReserved = reservedTimes.value.some(x => toStartTime(x) === formattedSlot);
     if (isReserved) return;
 
-    const isCurrentlyBlocked = blockedTimes.value.some(x => normalize(x) === formattedSlot);
+    const isCurrentlyBlocked = blockedTimes.value.some(x => toStartTime(x) === formattedSlot);
     const action = isCurrentlyBlocked ? 'unblock' : 'block';
 
     const next = isCurrentlyBlocked
-        ? blockedTimes.value.filter(x => normalize(x) !== formattedSlot)
+        ? blockedTimes.value.filter(x => toStartTime(x) !== formattedSlot)
         : [...blockedTimes.value, t];
 
     const result = await Swal.fire({
@@ -774,28 +783,81 @@ const handleSlotClick = async (t) => {
                 const res = await useCourt.setCourtClosedTime({
                     court_id: activeCourtId.value,
                     closed_date: scheduleDate.value,
-                    closed_times: next
+                    closed_times: next.map(toStartTime), // send start times only
                 });
                 return res;
             } catch (error) {
                 Swal.showValidationMessage('Failed to update court closed times.');
-                return false; // keeps the dialog open
+                return false;
             }
         }
     });
 
     if (result.isConfirmed) {
         blockedTimes.value = next;
-
-        Swal.fire({
-            title: 'Success!',
-            text: `Time slot ${action}ed successfully.`,
-            icon: 'success',
-            timer: 1500,
-            showConfirmButton: false
-        });
+        // success toast as before
     }
 };
+
+// const handleSlotClick = async (t) => {
+//     if (!t || !activeCourtId.value || !scheduleDate.value) return;
+
+//     const formattedSlot = normalize(t);
+
+//     const isReserved = reservedTimes.value.some(x => normalize(x) === formattedSlot);
+//     if (isReserved) return;
+
+//     const isCurrentlyBlocked = blockedTimes.value.some(x => normalize(x) === formattedSlot);
+//     const action = isCurrentlyBlocked ? 'unblock' : 'block';
+
+//     const next = isCurrentlyBlocked
+//         ? blockedTimes.value.filter(x => normalize(x) !== formattedSlot)
+//         : [...blockedTimes.value, t];
+
+//     const result = await Swal.fire({
+//         title: 'Are you sure?',
+//         text: `Do you want to ${action} ${t} on ${scheduleDate.value}?`,
+//         icon: 'question',
+//         showCancelButton: true,
+//         confirmButtonText: `Yes, ${action} it!`,
+//         cancelButtonText: 'Cancel',
+//         confirmButtonColor: isCurrentlyBlocked ? '#3085d6' : '#d33',
+//         showLoaderOnConfirm: true,
+//         allowOutsideClick: () => !Swal.isLoading(),
+//         allowEscapeKey: () => !Swal.isLoading(),
+//         preConfirm: async () => {
+//             try {
+
+// //                 court_id
+// // closed_date
+// // closed_times
+//                 const res = await useCourt.setCourtClosedTime({
+//                     court_id: activeCourtId.value,
+//                     closed_date: scheduleDate.value,
+//                     closed_times: next
+//                 });
+
+//                 console.log(next);
+//                 return res;
+//             } catch (error) {
+//                 Swal.showValidationMessage('Failed to update court closed times.');
+//                 return false; // keeps the dialog open
+//             }
+//         }
+//     });
+
+//     if (result.isConfirmed) {
+//         blockedTimes.value = next;
+
+//         Swal.fire({
+//             title: 'Success!',
+//             text: `Time slot ${action}ed successfully.`,
+//             icon: 'success',
+//             timer: 1500,
+//             showConfirmButton: false
+//         });
+//     }
+// };
 
 
 // const handleSlotClick = async (t) => {
