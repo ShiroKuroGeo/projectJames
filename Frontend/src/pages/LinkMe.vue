@@ -1564,78 +1564,57 @@ async function selectVenue(slug) {
     }
 }
 
-
 const initLeafletMap = currentVenue => {
-
-    if (
-        typeof L === 'undefined'
-    ) {
-        console.warn(
-            'Leaflet is not available.'
-        )
-
+    if (typeof L === 'undefined') {
+        console.warn('Leaflet is not available.')
         return
     }
 
-    if (
-        !currentVenue ||
-        !currentVenue.latitude ||
-        !currentVenue.longitude
-    ) {
-        console.warn(
-            'Venue coordinates are missing.'
-        )
-
+    if (!currentVenue || !currentVenue.latitude || !currentVenue.longitude) {
+        console.warn('Venue coordinates are missing.')
         return
     }
 
     if (map.value) {
-
         map.value.remove()
-
         map.value = null
     }
 
-    map.value =
-        L.map(
-            'leaflet-map'
-        ).setView(
-            [
-                Number(
-                    currentVenue.latitude
-                ),
-                Number(
-                    currentVenue.longitude
-                )
-            ],
-            15
-        )
-
-
-    L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-        {
-            attribution:
-                '&copy; OpenStreetMap &copy; CARTO',
-            maxZoom: 19
-        }
-    ).addTo(
-        map.value
+    map.value = L.map('leaflet-map').setView(
+        [
+            Number(currentVenue.latitude),
+            Number(currentVenue.longitude)
+        ],
+        15
     )
 
+    // Using your exact Raster tile URL with the API key from your screenshot
+    L.tileLayer(
+        'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_4vm8_1_3ad2fd4739ac5aef8500ec4f',
+        {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            maxZoom: 19
+        }
+    ).addTo(map.value)
 
-    const marker =
-        L.marker([
-            Number(
-                currentVenue.latitude
-            ),
-            Number(
-                currentVenue.longitude
-            )
-        ]).addTo(
-            map.value
-        )
+    // Fix for the broken marker icon in production/bundlers
+    const defaultIcon = L.icon({
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    })
 
+    const marker = L.marker(
+        [
+            Number(currentVenue.latitude),
+            Number(currentVenue.longitude)
+        ],
+        { icon: defaultIcon }
+    ).addTo(map.value)
 
     marker.bindPopup(
         `
@@ -1654,6 +1633,96 @@ const initLeafletMap = currentVenue => {
         `
     ).openPopup()
 }
+
+// const initLeafletMap = currentVenue => {
+
+//     if (
+//         typeof L === 'undefined'
+//     ) {
+//         console.warn(
+//             'Leaflet is not available.'
+//         )
+
+//         return
+//     }
+
+//     if (
+//         !currentVenue ||
+//         !currentVenue.latitude ||
+//         !currentVenue.longitude
+//     ) {
+//         console.warn(
+//             'Venue coordinates are missing.'
+//         )
+
+//         return
+//     }
+
+//     if (map.value) {
+
+//         map.value.remove()
+
+//         map.value = null
+//     }
+
+//     map.value =
+//         L.map(
+//             'leaflet-map'
+//         ).setView(
+//             [
+//                 Number(
+//                     currentVenue.latitude
+//                 ),
+//                 Number(
+//                     currentVenue.longitude
+//                 )
+//             ],
+//             15
+//         )
+
+
+//     L.tileLayer(
+//         'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+//         {
+//             attribution:
+//                 '&copy; OpenStreetMap &copy; CARTO',
+//             maxZoom: 19
+//         }
+//     ).addTo(
+//         map.value
+//     )
+
+
+//     const marker =
+//         L.marker([
+//             Number(
+//                 currentVenue.latitude
+//             ),
+//             Number(
+//                 currentVenue.longitude
+//             )
+//         ]).addTo(
+//             map.value
+//         )
+
+
+//     marker.bindPopup(
+//         `
+//             <div style="
+//                 font-family: Inter, sans-serif;
+//                 padding: 4px;
+//             ">
+//                 <strong>
+//                     ${currentVenue.name || 'Venue'}
+//                 </strong>
+//                 <br>
+//                 <span>
+//                     ${currentVenue.area || ''}
+//                 </span>
+//             </div>
+//         `
+//     ).openPopup()
+// }
 
 function timeToMinutes(timeStr) {
     if (timeStr.includes('AM') || timeStr.includes('PM')) {
